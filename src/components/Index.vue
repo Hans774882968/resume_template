@@ -3,7 +3,8 @@
     <Navbar></Navbar>
     <div class="index-container">
       <div class="editor-container">
-        编辑表单
+        <div>编辑表单</div>
+        <el-button type="primary" @click="getPDF">导出为PDF</el-button>
         <div class="skin-container">
           <div class="skin-title">选择颜色：</div>
           <div class="theme-colors">
@@ -16,7 +17,7 @@
         </div>
       </div>
 
-      <div class="resume">
+      <div id="resume" class="resume">
         <div class="resume-head-container">
           <div class="right-box">
             <i class="qmfont qmicon-xueshimao"></i>
@@ -25,7 +26,7 @@
           <dl id="resume-head" class="left-box" :style="{color: theme.color}">
             <dt class="left" :style="{borderColor: theme.color}">个人简历</dt>
             <dd class="right">
-              <p>我的简历模板应用QAQ</p>
+              <p>努力超越自己，每天进步一点点</p>
               Personal resume
             </dd>
           </dl>
@@ -110,6 +111,7 @@
 <script>
 import ModuleHead from './ModuleHead'
 import Navbar from './Navbar'
+import html2PDF from '@/html2PDF'
 
 export default {
   name: 'Index',
@@ -141,6 +143,9 @@ export default {
     }
   },
   methods: {
+    getPDF () {
+      html2PDF.downloadPDF(document.getElementById('resume'), '我的简历')
+    },
     updateSkinColor (idx) {
       this.colorIndex = idx
       this.theme.color = this.skinColors[idx]
@@ -166,6 +171,7 @@ export default {
     padding: 1.5rem;
   }
   .skin-container{
+    margin-top: 0.5rem;
     display: flex;
   }
   .skin-container .skin-title{

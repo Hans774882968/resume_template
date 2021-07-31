@@ -19,10 +19,14 @@ npm run build --report
 
 #下载element-ui
 npm install --save element-ui
+
+#导出pdf功能的依赖
+npm install html2canvas jspdf --save
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
 我的简历生成应用。样式参考：[全民简历](https://www.qmjianli.com/)
 
-目前可以换肤，即更换简历颜色主题。darkerColor的颜色是rgb的10进制值各减40
+- 有换肤功能，即更换简历颜色主题。darkerColor的颜色是rgb的10进制值各减40
+- 目前可以导出为pdf，pdf是截图的形式
