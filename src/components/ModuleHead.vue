@@ -31,6 +31,7 @@ export default {
     color: #fff;
     white-space: nowrap;/* 文本不换行 */
     margin-left: -1rem;
+    font-size: 16px;
   }
   .module-title{
     padding-left: 1.5625rem;

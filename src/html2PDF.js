@@ -2,8 +2,8 @@ import html2canvas from 'html2canvas'
 import JsPDF from 'jspdf'
 
 /**
- * @param  ele          要生成 pdf 的DOM元素（容器）
- * @param  padfName     PDF文件生成后的文件名字
+ * @param  ele         要生成PDF的DOM元素（容器）
+ * @param  pdfName     PDF文件生成后的文件名字
  * */
 
 function downloadPDF (ele, pdfName) {
@@ -13,15 +13,15 @@ function downloadPDF (ele, pdfName) {
   let eleOffsetTop = ele.offsetTop // 获得该容器到文档顶部的距离
   let eleOffsetLeft = ele.offsetLeft // 获得该容器到文档最左的距离
 
-  var canvas = document.createElement('canvas')
-  var abs = 0
+  let canvas = document.createElement('canvas')
+  let abs = 0
 
-  let win_in = document.documentElement.clientWidth || document.body.clientWidth // 获得当前可视窗口的宽度（不包含滚动条）
-  let win_out = window.innerWidth // 获得当前窗口的宽度（包含滚动条）
+  let winIn = document.documentElement.clientWidth || document.body.clientWidth // 获得当前可视窗口的宽度（不包含滚动条）
+  let winOut = window.innerWidth // 获得当前窗口的宽度（包含滚动条）
 
-  if (win_out > win_in) {
+  if (winOut > winIn) {
     // abs = (win_o - win_i)/2;    // 获得滚动条长度的一半
-    abs = (win_out - win_in) / 2 // 获得滚动条宽度的一半
+    abs = (winOut - winIn) / 2 // 获得滚动条宽度的一半
     // console.log(a, '新abs');
   }
 

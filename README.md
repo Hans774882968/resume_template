@@ -29,4 +29,5 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 我的简历生成应用。样式参考：[全民简历](https://www.qmjianli.com/)
 
 - 有换肤功能，即更换简历颜色主题。darkerColor的颜色是rgb的10进制值各减40
-- 目前可以导出为pdf，pdf是截图的形式
+- 可以导出为pdf，pdf是截图的形式
+- 目前可以调字体大小

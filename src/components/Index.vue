@@ -1,10 +1,29 @@
 <template>
   <div>
-    <Navbar></Navbar>
+    <Navbar :fontDialogVisible.sync="fontDialogVisible"></Navbar>
+
+    <el-dialog
+      title="字体设置"
+      :visible.sync="fontDialogVisible"
+      width="30%">
+      <div class="font-dialog">
+        <ul>
+          <li class="font-item">
+            <h3 class="left-title">字体大小：</h3>
+            <el-select v-model="fontValue" placeholder="字体大小">
+              <el-option v-for="item in fontValues" :key="item.value" :label="item.label" :value="item.value"></el-option>
+            </el-select>
+          </li>
+        </ul>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="fontDialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
+
     <div class="index-container">
       <div class="editor-container">
         <div>编辑表单</div>
-        <el-button type="primary" @click="getPDF">导出为PDF</el-button>
         <div class="skin-container">
           <div class="skin-title">选择颜色：</div>
           <div class="theme-colors">
@@ -43,7 +62,7 @@
           </div>
         </div>
 
-        <div class="resume-body">
+        <div class="resume-body" :style="{fontSize: fontValue + 'px'}">
           <div class="module">
             <ModuleHead :title="`基本信息`" :color="theme.color"
                         :darkerColor="darkerColor">
@@ -111,7 +130,6 @@
 <script>
 import ModuleHead from './ModuleHead'
 import Navbar from './Navbar'
-import html2PDF from '@/html2PDF'
 
 export default {
   name: 'Index',
@@ -125,7 +143,13 @@ export default {
       ],
       theme: {
         color: '#4e7282'
-      }
+      },
+      fontValue: '12',
+      fontValues: [
+        {value: '12', label: '12'}, {value: '13', label: '13'}, {value: '14', label: '14'},
+        {value: '15', label: '15'}, {value: '16', label: '16'}
+      ],
+      fontDialogVisible: false
     }
   },
   computed: {
@@ -143,9 +167,6 @@ export default {
     }
   },
   methods: {
-    getPDF () {
-      html2PDF.downloadPDF(document.getElementById('resume'), '我的简历')
-    },
     updateSkinColor (idx) {
       this.colorIndex = idx
       this.theme.color = this.skinColors[idx]
@@ -163,6 +184,13 @@ export default {
     min-height: 100vh;
     padding-top: 1.25rem;
     align-items: flex-start;/* 不拉伸 */
+  }
+
+  .font-dialog .font-item{
+    display: flex;
+  }
+  .font-item .left-title{
+    line-height: 40px;/* 和el-select默认高度相同 */
   }
 
   .editor-container{
@@ -277,7 +305,6 @@ export default {
     padding: 1.25rem;
   }
   .basic-info-item{
-    font-size: 13px;
     min-width: 4rem;
   }
   .basic-info-item .tag{
