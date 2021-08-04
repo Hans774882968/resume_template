@@ -23,7 +23,6 @@
 
     <div class="index-container">
       <div class="editor-container">
-        <div>编辑表单</div>
         <div class="skin-container">
           <div class="skin-title">选择颜色：</div>
           <div class="theme-colors">
@@ -34,6 +33,7 @@
             </div>
           </div>
         </div>
+        <FAQ></FAQ>
       </div>
 
       <div id="resume" class="resume">
@@ -130,10 +130,11 @@
 <script>
 import ModuleHead from './ModuleHead'
 import Navbar from './Navbar'
+import FAQ from './FAQ'
 
 export default {
   name: 'Index',
-  components: {ModuleHead, Navbar},
+  components: {ModuleHead, Navbar, FAQ},
   data () {
     return {
       colorIndex: 0,
@@ -144,7 +145,7 @@ export default {
       theme: {
         color: '#4e7282'
       },
-      fontValue: '12',
+      fontValue: '14',
       fontValues: [
         {value: '12', label: '12'}, {value: '13', label: '13'}, {value: '14', label: '14'},
         {value: '15', label: '15'}, {value: '16', label: '16'}
@@ -195,12 +196,16 @@ export default {
 
   .editor-container{
     width: 35%;
-    background-color: white;
+    background-color: #f9f9f9;
     padding: 1.5rem;
   }
   .skin-container{
     margin-top: 0.5rem;
+    background-color: white;
     display: flex;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 0.5rem rgba(0,0,0,0.2);
+    padding: 1.25rem;
   }
   .skin-container .skin-title{
     font-weight: bold;
