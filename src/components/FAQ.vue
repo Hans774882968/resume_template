@@ -4,10 +4,10 @@
     <ul class="qa-list">
       <li class="item" v-for="(item,idx) in qa" :key="idx">
         <div class="question"
-             :style="{color: idx === activeIndex ? '#409EFF' : '#333'}"
-             @click="changeActiveIndex(idx)"
-             @mouseenter="questionTextColor($event,'#409EFF',idx)"
-             @mouseleave="questionTextColor($event,'#333',idx)">{{ item.q }}</div>
+             :style="{color: idx === activeIndex ? '#409EFF' : ''}"
+             @click="changeActiveIndex(idx)">
+          {{ item.q }}
+        </div>
         <div class="answer" :style="{display: idx === activeIndex ? 'block' : 'none'}">{{ item.a }}</div>
       </li>
     </ul>
@@ -39,10 +39,6 @@ export default {
   methods: {
     changeActiveIndex (idx) {
       this.activeIndex = idx
-    },
-    questionTextColor (e, c, idx) {
-      if (c === '#333' && idx === this.activeIndex) return
-      e.target.style.color = c
     }
   }
 }
@@ -54,6 +50,8 @@ export default {
     background-color: white;
     border: 1px solid #ddd;
     box-shadow: 0 0 0.5rem rgba(0,0,0,0.2);
+    border-radius: 1rem;
+    overflow: hidden;/* 隐藏.head的尖角 */
   }
   .container .head{
     background-color: #f2f2f2;
@@ -72,6 +70,7 @@ export default {
     padding: 1rem 0;
   }
   .question{
+    color: #333;
     cursor: pointer;
   }
   .question:hover{

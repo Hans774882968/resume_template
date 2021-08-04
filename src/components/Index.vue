@@ -9,9 +9,17 @@
       <div class="font-dialog">
         <ul>
           <li class="font-item">
-            <h3 class="left-title">字体大小：</h3>
+            <h3 class="left-title">字体大小</h3>
+            <h3 class="title-right">：</h3>
             <el-select v-model="fontValue" placeholder="字体大小">
               <el-option v-for="item in fontValues" :key="item.value" :label="item.label" :value="item.value"></el-option>
+            </el-select>
+          </li>
+          <li class="font-item">
+            <h3 class="left-title">字体</h3>
+            <h3 class="title-right">：</h3>
+            <el-select v-model="fontFamily" placeholder="字体">
+              <el-option v-for="item in fontFamilies" :key="item.value" :label="item.label" :value="item.value"></el-option>
             </el-select>
           </li>
         </ul>
@@ -36,7 +44,7 @@
         <FAQ></FAQ>
       </div>
 
-      <div id="resume" class="resume">
+      <div id="resume" class="resume" :style="{fontFamily: fontFamily}">
         <div class="resume-head-container">
           <div class="right-box">
             <i class="qmfont qmicon-xueshimao"></i>
@@ -62,7 +70,16 @@
           </div>
         </div>
 
-        <div class="resume-body" :style="{fontSize: fontValue + 'px'}">
+        <draggable
+          class="resume-body"
+          :style="{fontSize: fontValue + 'px'}"
+          tag="div"
+          v-bind="{
+            animation: 200,
+            group: 'description',
+            disabled: false,
+            ghostClass: 'ghost'
+          }">
           <div class="module">
             <ModuleHead :title="`基本信息`" :color="theme.color"
                         :darkerColor="darkerColor">
@@ -121,7 +138,7 @@
               </li>
             </ul>
           </div>
-        </div>
+        </draggable>
       </div>
     </div>
   </div>
@@ -131,10 +148,11 @@
 import ModuleHead from './ModuleHead'
 import Navbar from './Navbar'
 import FAQ from './FAQ'
+import Draggable from 'vuedraggable'
 
 export default {
   name: 'Index',
-  components: {ModuleHead, Navbar, FAQ},
+  components: {ModuleHead, Navbar, FAQ, Draggable},
   data () {
     return {
       colorIndex: 0,
@@ -149,6 +167,15 @@ export default {
       fontValues: [
         {value: '12', label: '12'}, {value: '13', label: '13'}, {value: '14', label: '14'},
         {value: '15', label: '15'}, {value: '16', label: '16'}
+      ],
+      fontFamily: 'Microsoft YaHei,SimSun,PingFang SC,PingFang SC Regular',
+      fontFamilies: [
+        {value: 'Microsoft YaHei,SimSun,PingFang SC,PingFang SC Regular', label: '微软雅黑'},
+        {value: 'SimSun,Microsoft YaHei', label: '宋体'},
+        {value: 'SimHei,Microsoft YaHei', label: '黑体'},
+        {value: 'Arial,Microsoft YaHei', label: 'Arial'},
+        {value: 'PingFang SC,PingFang SC Regular,Heiti SC,Microsoft YaHei', label: '平方'},
+        {value: 'KaiTi,Microsoft YaHei', label: '楷体'}
       ],
       fontDialogVisible: false
     }
@@ -188,22 +215,31 @@ export default {
   }
 
   .font-dialog .font-item{
+    margin-top: 1rem;
     display: flex;
+    justify-content: center;
   }
   .font-item .left-title{
     line-height: 40px;/* 和el-select默认高度相同 */
+    min-width: 4.5rem;
+    text-align-last: justify;
+  }
+  .font-item .title-right{
+    line-height: 40px;/* 和el-select默认高度相同 */
+    margin-left: 0.25rem;
   }
 
   .editor-container{
     width: 35%;
     background-color: #f9f9f9;
-    padding: 1.5rem;
+    position: sticky;
+    top: calc(4.5rem + 1.25rem);/* Navbar的高度 + .index-container的padding-top */
   }
   .skin-container{
-    margin-top: 0.5rem;
     background-color: white;
     display: flex;
     border: 1px solid #ddd;
+    border-radius: 1rem;
     box-shadow: 0 0 0.5rem rgba(0,0,0,0.2);
     padding: 1.25rem;
   }
@@ -217,8 +253,8 @@ export default {
     grid-template-columns: repeat(6,1fr);
   }
   .skin-container .color-item{
-    width: 1.4rem;
-    height: 1.4rem;
+    width: 2rem;
+    height: 2rem;
     border-radius: 50%;
   }
   .skin-container .color-item:hover{
@@ -281,7 +317,8 @@ export default {
   }
   .line-box .line-r{
     margin-top: 0.3rem;
-    flex: 0.9;
+    flex: 1;
+    margin-left: 1.5rem;
     background-color: #c19f67;
   }
   .line-r-triangle{

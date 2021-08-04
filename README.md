@@ -22,6 +22,9 @@ npm install --save element-ui
 
 #导出pdf功能的依赖
 npm install html2canvas jspdf --save
+
+#简历模块拖拽功能
+npm install vuedraggable --save
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
@@ -30,4 +33,5 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 
 - 有换肤功能，即更换简历颜色主题。darkerColor的颜色是rgb的10进制值各减40
 - 可以导出为pdf，pdf是截图的形式
-- 目前可以调字体大小
+- 可以调字体和文字大小
+- 目前支持通过拖拽简历模块，调整模块顺序
