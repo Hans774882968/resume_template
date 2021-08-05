@@ -35,4 +35,5 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 - 可以导出为pdf，pdf是截图的形式
 - 可以调字体和文字大小
 - 支持通过拖拽简历模块，调整模块顺序
-- 目前可以隐藏模块
+- 可以隐藏模块
+- 目前可以编辑基本信息~

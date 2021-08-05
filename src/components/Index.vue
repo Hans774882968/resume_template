@@ -1,6 +1,9 @@
 <template>
   <div>
-    <Navbar :fontDialogVisible.sync="fontDialogVisible"></Navbar>
+    <Navbar
+      :fontDialogVisible.sync="fontDialogVisible"
+      :resumeTitleDialogVisible.sync="resumeTitleDialogVisible">
+    </Navbar>
 
     <el-dialog
       title="字体设置"
@@ -29,8 +32,27 @@
       </span>
     </el-dialog>
 
+    <el-dialog
+      title="标题设置"
+      :visible.sync="resumeTitleDialogVisible"
+      width="30%">
+      <div class="resume-title-dialog">
+        <div class="resume-title-item">
+          <h3 class="title">简历标题</h3>
+          <el-input placeholder="个人简历" v-model="resume.title"></el-input>
+        </div>
+        <div class="resume-title-item">
+          <h3 class="title">简历Slogan</h3>
+          <el-input placeholder="我命由我不由天" v-model="resume.slogan"></el-input>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="resumeTitleDialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
+
     <div class="index-container">
-      <div class="editor-container">
+      <div class="sticky-container">
         <div class="skin-container">
           <div class="skin-title">
             <i class="webfont webicon-skin"></i>
@@ -54,9 +76,9 @@
             <i class="myfont myicon-shoutibao"></i>
           </div>
           <dl id="resume-head" class="left-box" :style="{color: theme.color}">
-            <dt class="left" :style="{borderColor: theme.color}">个人简历</dt>
+            <dt class="left" :style="{borderColor: theme.color}">{{ resume.title }}</dt>
             <dd class="right">
-              <p>努力超越自己，每天进步一点点</p>
+              <p>{{ resume.slogan }}</p>
               Personal resume
             </dd>
           </dl>
@@ -88,21 +110,33 @@
                         :darkerColor="darkerColor">
             </ModuleHead>
             <ul class="module-content" :style="moduleContentBorder">
-              <li class="basic-info-item">
+              <li v-show="resume.name.length > 0" class="basic-info-item">
                 <span class="tag">姓名</span>
-                ：hans
+                ：{{ resume.name }}
               </li>
-              <li class="basic-info-item">
-                <span class="tag">年龄</span>
-                ：22
+              <li v-show="resume.date" class="basic-info-item">
+                <span class="tag">{{ toAge ? '年龄' : '出生年月'}}</span>
+                ：{{ resume.date }}
               </li>
-              <li class="basic-info-item">
+              <li v-show="resume.gender !== '不填'" class="basic-info-item">
                 <span class="tag">性别</span>
-                ：男
+                ：{{ resume.gender }}
               </li>
-              <li class="basic-info-item">
+              <li v-show="resume.phone.length > 0" class="basic-info-item">
+                <span class="tag">联系电话</span>
+                ：{{ resume.phone }}
+              </li>
+              <li v-show="resume.email.length > 0" class="basic-info-item">
+                <span class="tag">联系邮箱</span>
+                ：{{ resume.email }}
+              </li>
+              <li v-show="resume.seniority !== '不填'" class="basic-info-item">
+                <span class="tag">工作年限</span>
+                ：{{ resume.seniority }}
+              </li>
+              <li v-show="resume.jobIntention.length > 0" class="basic-info-item">
                 <span class="tag">求职意向</span>
-                ：前端工程师
+                ：{{ resume.jobIntention }}
               </li>
             </ul>
           </div>
@@ -145,7 +179,7 @@
       </div>
     </div>
 
-    <div class="editor">
+    <div class="editor-container">
       <div
         :title="showEditBody ? '收起编辑区' : '展开编辑区'"
         :class="['close','webfont',showEditBody ? 'webicon-arrowdown' : 'webicon-arrowup']"
@@ -156,7 +190,57 @@
         <EditTopItem :show.sync="resume.skill" :title="'专业技能'"></EditTopItem>
         <EditTopItem :show.sync="resume.honor" :title="'荣誉证书'"></EditTopItem>
       </ul>
-      <div class="edit-body" v-show="showEditBody">内容</div>
+      <div class="edit-body" v-show="showEditBody">
+        <ul class="basic-info-edit">
+          <li>
+            <p>您的姓名</p>
+            <el-input v-model="resume.name" placeholder="姓名"></el-input>
+          </li>
+          <li>
+            <p>出生年月</p>
+            <el-date-picker
+              v-model="resume.date"
+              type="month"
+              value-format="yyyy-MM"
+              placeholder="出生年月"></el-date-picker>
+            <el-checkbox v-model="toAge">转年龄</el-checkbox>
+          </li>
+          <li>
+            <p>性别</p>
+            <el-select v-model="resume.gender" placeholder="性别">
+              <el-option
+                v-for="item in genders"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </li>
+          <li>
+            <p>联系电话</p>
+            <el-input v-model="resume.phone" placeholder="联系电话"></el-input>
+          </li>
+          <li>
+            <p>联系邮箱</p>
+            <el-input v-model="resume.email" placeholder="联系邮箱"></el-input>
+          </li>
+          <li>
+            <p>工作年限</p>
+            <el-select v-model="resume.seniority" placeholder="工作年限">
+              <el-option
+                v-for="item in seniorities"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </li>
+          <li>
+            <p>求职意向</p>
+            <el-input v-model="resume.jobIntention" placeholder="求职意向"></el-input>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
@@ -196,12 +280,35 @@ export default {
         {value: 'KaiTi,Microsoft YaHei', label: '楷体'}
       ],
       fontDialogVisible: false,
+      resumeTitleDialogVisible: false,
       showEditBody: false,
+      toAge: false,
       resume: {
+        title: '个人简历',
+        slogan: '努力超越自己，每天进步一点点',
+        name: 'hans774882968',
+        date: '',
+        gender: '不填',
+        phone: '15888888888',
+        email: '774882968@qq.com',
+        seniority: '应届生',
+        jobIntention: '前端工程师',
         showBasicInfo: true,
         skill: true,
         honor: true
-      }
+      },
+      seniorities: [
+        {value: '不填', label: '不填'},
+        {value: '应届生', label: '应届生'},
+        {value: '1年经验', label: '1年经验'},
+        {value: '2年经验', label: '2年经验'},
+        {value: '3年经验', label: '3年经验'},
+        {value: '4年经验', label: '4年经验'},
+        {value: '5年经验', label: '5年经验'}
+      ],
+      genders: [
+        {value: '不填', label: '不填'}, {value: '男', label: '男'}, {value: '女', label: '女'}
+      ]
     }
   },
   computed: {
@@ -256,7 +363,18 @@ export default {
     margin-left: 0.25rem;
   }
 
-  .editor-container{
+  .resume-title-item {
+    margin: 1rem 0;
+    display: flex;
+  }
+  .resume-title-item .title{
+    min-width: 6rem;
+    white-space: nowrap;
+    text-align: center;
+    line-height: 40px;/* 和el-input默认高度相同 */
+  }
+
+  .sticky-container{
     width: 35%;
     background-color: #f9f9f9;
     position: sticky;
@@ -399,7 +517,7 @@ export default {
     text-align-last: justify;/* 两端对齐 */
   }
 
-  .editor{
+  .editor-container{
     width: 100%;
     /*min-height: 10rem;*/
     position: fixed;
@@ -435,5 +553,24 @@ export default {
     justify-content: center;
   }
   .edit-body{
+    width: 75rem;
+    margin: 0 auto;
+  }
+  .basic-info-edit{
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+  }
+  .basic-info-edit .el-date-editor{
+    width: 120px;/* 日期选择器宽度限制 */
+  }
+  .basic-info-edit li{
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    column-gap: 0.5rem;
+  }
+  .basic-info-edit p{
+    min-width: 72px;
+    text-align: right;
   }
 </style>

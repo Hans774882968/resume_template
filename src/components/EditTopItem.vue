@@ -9,7 +9,7 @@
         active-color="rgb(19,206,102)">
       </el-switch>
     </el-tooltip>
-    <h5 class="title">{{ title }}</h5>
+    <h4 class="title">{{ title }}</h4>
   </li>
 </template>
 
