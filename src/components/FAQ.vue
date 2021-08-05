@@ -8,7 +8,7 @@
              @click="changeActiveIndex(idx)">
           {{ item.q }}
         </div>
-        <div class="answer" :style="{display: idx === activeIndex ? 'block' : 'none'}">{{ item.a }}</div>
+        <div class="answer" v-show="idx === activeIndex">{{ item.a }}</div>
       </li>
     </ul>
   </div>
@@ -32,6 +32,10 @@ export default {
         {
           q: '怎么更换模块顺序？',
           a: '拖动右侧简历模块更换顺序。'
+        },
+        {
+          q: '不想要的模块怎么隐藏？',
+          a: '点击模块分类上面的绿色圆点开关，可以隐藏模块。'
         }
       ]
     }

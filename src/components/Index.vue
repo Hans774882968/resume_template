@@ -32,7 +32,10 @@
     <div class="index-container">
       <div class="editor-container">
         <div class="skin-container">
-          <div class="skin-title">选择颜色：</div>
+          <div class="skin-title">
+            <i class="webfont webicon-skin"></i>
+            选择颜色：
+          </div>
           <div class="theme-colors">
             <div class="color-item"
                  v-for="(c,idx) in skinColors" :key="idx"
@@ -47,8 +50,8 @@
       <div id="resume" class="resume" :style="{fontFamily: fontFamily}">
         <div class="resume-head-container">
           <div class="right-box">
-            <i class="qmfont qmicon-xueshimao"></i>
-            <i class="qmfont qmicon-shoutibao"></i>
+            <i class="myfont myicon-xueshimao"></i>
+            <i class="myfont myicon-shoutibao"></i>
           </div>
           <dl id="resume-head" class="left-box" :style="{color: theme.color}">
             <dt class="left" :style="{borderColor: theme.color}">个人简历</dt>
@@ -80,7 +83,7 @@
             disabled: false,
             ghostClass: 'ghost'
           }">
-          <div class="module">
+          <div class="module" v-show="resume.showBasicInfo">
             <ModuleHead :title="`基本信息`" :color="theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
@@ -103,7 +106,7 @@
               </li>
             </ul>
           </div>
-          <div class="module">
+          <div class="module" v-show="resume.skill">
             <ModuleHead :title="`专业技能`" :color="theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
@@ -122,7 +125,7 @@
               </li>
             </ul>
           </div>
-          <div class="module">
+          <div class="module" v-show="resume.honor">
             <ModuleHead :title="`荣誉证书`" :color="theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
@@ -141,6 +144,20 @@
         </draggable>
       </div>
     </div>
+
+    <div class="editor">
+      <div
+        :title="showEditBody ? '收起编辑区' : '展开编辑区'"
+        :class="['close','webfont',showEditBody ? 'webicon-arrowdown' : 'webicon-arrowup']"
+        @click="changeShowEditBody">
+      </div>
+      <ul class="edit-top">
+        <EditTopItem :show.sync="resume.showBasicInfo" :title="'基本信息'"></EditTopItem>
+        <EditTopItem :show.sync="resume.skill" :title="'专业技能'"></EditTopItem>
+        <EditTopItem :show.sync="resume.honor" :title="'荣誉证书'"></EditTopItem>
+      </ul>
+      <div class="edit-body" v-show="showEditBody">内容</div>
+    </div>
   </div>
 </template>
 
@@ -149,10 +166,11 @@ import ModuleHead from './ModuleHead'
 import Navbar from './Navbar'
 import FAQ from './FAQ'
 import Draggable from 'vuedraggable'
+import EditTopItem from '@/components/EditTopItem'
 
 export default {
   name: 'Index',
-  components: {ModuleHead, Navbar, FAQ, Draggable},
+  components: {EditTopItem, ModuleHead, Navbar, FAQ, Draggable},
   data () {
     return {
       colorIndex: 0,
@@ -177,7 +195,13 @@ export default {
         {value: 'PingFang SC,PingFang SC Regular,Heiti SC,Microsoft YaHei', label: '平方'},
         {value: 'KaiTi,Microsoft YaHei', label: '楷体'}
       ],
-      fontDialogVisible: false
+      fontDialogVisible: false,
+      showEditBody: false,
+      resume: {
+        showBasicInfo: true,
+        skill: true,
+        honor: true
+      }
     }
   },
   computed: {
@@ -198,6 +222,9 @@ export default {
     updateSkinColor (idx) {
       this.colorIndex = idx
       this.theme.color = this.skinColors[idx]
+    },
+    changeShowEditBody () {
+      this.showEditBody = !this.showEditBody
     }
   }
 }
@@ -269,7 +296,24 @@ export default {
     box-shadow: 0 0 1rem rgba(0,0,0,0.16);
   }
   .resume-head-container{
-    padding: 1rem 2rem 1rem 2rem;
+    padding: 1rem 4rem 1rem 2rem;
+  }
+  .right-box{
+    float: right;
+    margin-top: 0.35rem;
+    display: flex;
+  }
+  .right-box i{
+    margin-left: 10px;
+    font-size: 22px;
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    border-radius: 50%;
+    color: #fff;
+    background-color: #c19f67;
   }
   .left-box{
     overflow: hidden;/* bfc */
@@ -353,5 +397,43 @@ export default {
     display: inline-block;
     width: 4rem;
     text-align-last: justify;/* 两端对齐 */
+  }
+
+  .editor{
+    width: 100%;
+    /*min-height: 10rem;*/
+    position: fixed;
+    bottom: 0;
+    background-color: white;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  }
+  .close{
+    position: absolute;
+    top: calc(-3rem + 0.5rem);
+    left: 50%;
+    margin-left: -3rem;
+    width: 6rem;
+    height: 6rem;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: white;
+    color: #409EFF;
+    font-size: 20px;
+    line-height: 50px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  }
+  .close:hover{
+    top: -3rem;
+  }
+  .edit-top{
+    position:relative;
+    background-color: white;/* 起到遮挡效果 */
+    width: 100%;
+    height: 5rem;
+    display: flex;
+    justify-content: center;
+  }
+  .edit-body{
   }
 </style>
