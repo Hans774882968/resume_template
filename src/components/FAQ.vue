@@ -50,7 +50,7 @@ export default {
 
 <style scoped>
   .container{
-    margin-top: 2rem;
+    margin-top: 1rem;
     background-color: white;
     border: 1px solid #ddd;
     box-shadow: 0 0 0.5rem rgba(0,0,0,0.2);

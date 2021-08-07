@@ -27,6 +27,12 @@
         </div>
       </el-menu-item>
       <el-menu-item @mouseenter.native="bgColorMaintain">
+        <div class="set-btn" @click="pageDialog">
+          <i class="set-font webfont webicon-page"></i>
+          <div class="set-title">间距设置</div>
+        </div>
+      </el-menu-item>
+      <el-menu-item @mouseenter.native="bgColorMaintain">
         <el-button type="primary" @click="getPDF">导出为PDF</el-button>
       </el-menu-item>
     </el-menu>
@@ -40,7 +46,8 @@ export default {
   name: 'Navbar',
   props: {
     fontDialogVisible: Boolean,
-    resumeTitleDialogVisible: Boolean
+    resumeTitleDialogVisible: Boolean,
+    pageDialogVisible: Boolean
   },
   methods: {
     getPDF () {
@@ -54,6 +61,9 @@ export default {
     },
     resumeTitleDialog () {
       this.$emit('update:resumeTitleDialogVisible', !this.resumeTitleDialogVisible)
+    },
+    pageDialog () {
+      this.$emit('update:pageDialogVisible', !this.pageDialogVisible)
     }
   }
 }

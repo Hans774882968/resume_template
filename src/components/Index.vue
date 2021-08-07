@@ -2,7 +2,8 @@
   <div>
     <Navbar
       :fontDialogVisible.sync="fontDialogVisible"
-      :resumeTitleDialogVisible.sync="resumeTitleDialogVisible">
+      :resumeTitleDialogVisible.sync="resumeTitleDialogVisible"
+      :pageDialogVisible.sync="pageDialogVisible">
     </Navbar>
 
     <el-dialog
@@ -48,6 +49,26 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="resumeTitleDialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog
+      title="间距设置"
+      :visible.sync="pageDialogVisible"
+      width="30%">
+      <div class="page-dialog">
+        <div class="page-dialog-item">
+          <h3 class="title">页面边距：<span style="color: #f60">{{ spacing.padding }}</span></h3>
+          <el-slider v-model="spacing.padding" :step="2" :min="20" :max="50"></el-slider>
+        </div>
+        <div class="page-dialog-item">
+          <h3 class="title">模块上下间距：<span style="color: #f60">{{ spacing.moduleSpace }}</span></h3>
+          <el-slider v-model="spacing.moduleSpace" :step="1" :min="10" :max="30"></el-slider>
+        </div>
+        <el-button @click="resetSpacing">重置</el-button>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="pageDialogVisible = false">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -97,7 +118,11 @@
 
         <draggable
           class="resume-body"
-          :style="{fontSize: fontValue + 'px'}"
+          :style="{
+            fontSize: fontValue + 'px',
+            paddingLeft: `${spacing.padding}px`,
+            paddingRight: `${spacing.padding + 10}px`
+          }"
           tag="div"
           v-bind="{
             animation: 200,
@@ -105,18 +130,18 @@
             disabled: false,
             ghostClass: 'ghost'
           }">
-          <div class="module" v-show="resume.showBasicInfo">
+          <div class="module basic-info" v-show="resume.showBasicInfo">
             <ModuleHead :title="`基本信息`" :color="theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
-            <ul class="module-content" :style="moduleContentBorder">
+            <ul class="module-content" :style="moduleContentStyle">
               <li v-show="resume.name.length > 0" class="basic-info-item">
                 <span class="tag">姓名</span>
                 ：{{ resume.name }}
               </li>
               <li v-show="resume.date" class="basic-info-item">
                 <span class="tag">{{ toAge ? '年龄' : '出生年月'}}</span>
-                ：{{ resume.date }}
+                ：{{ toAge ? monthDiff : resume.date }}
               </li>
               <li v-show="resume.gender !== '不填'" class="basic-info-item">
                 <span class="tag">性别</span>
@@ -140,11 +165,19 @@
               </li>
             </ul>
           </div>
+          <div class="module">
+            <ModuleHead :title="`教育背景`" :color="theme.color"
+                        :darkerColor="darkerColor">
+            </ModuleHead>
+            <ul class="module-content" :style="moduleContentStyle">
+              四川大学 计算机科学与技术
+            </ul>
+          </div>
           <div class="module" v-show="resume.skill">
             <ModuleHead :title="`专业技能`" :color="theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
-            <ul class="module-content" :style="moduleContentBorder">
+            <ul class="module-content" :style="moduleContentStyle">
               <li class="basic-info-item">
                 1
               </li>
@@ -163,7 +196,7 @@
             <ModuleHead :title="`荣誉证书`" :color="theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
-            <ul class="module-content" :style="moduleContentBorder">
+            <ul class="module-content" :style="moduleContentStyle">
               <li class="basic-info-item">
                 ICPC贺州站银牌
               </li>
@@ -202,6 +235,7 @@
               v-model="resume.date"
               type="month"
               value-format="yyyy-MM"
+              :picker-options="resume.dateLegal"
               placeholder="出生年月"></el-date-picker>
             <el-checkbox v-model="toAge">转年龄</el-checkbox>
           </li>
@@ -265,6 +299,10 @@ export default {
       theme: {
         color: '#4e7282'
       },
+      spacing: {
+        padding: 32,
+        moduleSpace: 20
+      },
       fontValue: '14',
       fontValues: [
         {value: '12', label: '12'}, {value: '13', label: '13'}, {value: '14', label: '14'},
@@ -281,6 +319,7 @@ export default {
       ],
       fontDialogVisible: false,
       resumeTitleDialogVisible: false,
+      pageDialogVisible: false,
       showEditBody: false,
       toAge: false,
       resume: {
@@ -288,6 +327,14 @@ export default {
         slogan: '努力超越自己，每天进步一点点',
         name: 'hans774882968',
         date: '',
+        dateLegal: {
+          disabledDate: time => {
+            let now = new Date()
+            if (time.getFullYear() < now.getFullYear()) return false
+            if (time.getFullYear() > now.getFullYear()) return true
+            return time.getMonth() > now.getMonth()
+          }
+        },
         gender: '不填',
         phone: '15888888888',
         email: '774882968@qq.com',
@@ -312,10 +359,12 @@ export default {
     }
   },
   computed: {
-    moduleContentBorder () {
+    moduleContentStyle () {
       return {
         borderTop: `1px solid ${this.theme.color}`,
-        borderLeft: `1px solid ${this.theme.color}`
+        borderLeft: `1px solid ${this.theme.color}`,
+        paddingTop: `${this.spacing.moduleSpace}px`,
+        paddingBottom: `${this.spacing.moduleSpace}px`
       }
     },
     darkerColor () {
@@ -323,9 +372,24 @@ export default {
       let g = parseInt(this.theme.color.substring(3, 5), 16)
       let b = parseInt(this.theme.color.substring(5), 16)
       return `rgb(${r - 40},${g - 40},${b - 40})`
+    },
+    monthDiff () {
+      if (!this.resume.date) return null
+      const st = new Date(this.resume.date)
+      const ed = new Date()
+      let year = ed.getFullYear() - st.getFullYear()
+      let month = ed.getMonth() - st.getMonth()
+      if (month < 0) {
+        --year
+        month += 12
+      }
+      return year
     }
   },
   methods: {
+    resetSpacing () {
+      this.spacing = {padding: 32, moduleSpace: 20}
+    },
     updateSkinColor (idx) {
       this.colorIndex = idx
       this.theme.color = this.skinColors[idx]
@@ -374,6 +438,14 @@ export default {
     line-height: 40px;/* 和el-input默认高度相同 */
   }
 
+  .page-dialog{
+    display: flex;
+    flex-direction: column;
+  }
+  .page-dialog button{
+    align-self: center;
+  }
+
   .sticky-container{
     width: 35%;
     background-color: #f9f9f9;
@@ -412,6 +484,7 @@ export default {
     width: 50%;
     background-color: white;
     box-shadow: 0 0 1rem rgba(0,0,0,0.16);
+    margin-bottom: 25rem;
   }
   .resume-head-container{
     padding: 1rem 4rem 1rem 2rem;
@@ -498,7 +571,8 @@ export default {
   }
 
   .resume-body{
-    padding: 0.5rem 2rem 1rem 2rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
   }
 
   .module{
@@ -508,8 +582,13 @@ export default {
   .module-content{
     padding: 1.25rem;
   }
+  .basic-info .module-content{
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+  }
   .basic-info-item{
     min-width: 4rem;
+    padding: 3px 3px 3px 0;
   }
   .basic-info-item .tag{
     display: inline-block;
