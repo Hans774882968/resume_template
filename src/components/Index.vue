@@ -65,6 +65,10 @@
           <h3 class="title">模块上下间距：<span style="color: #f60">{{ spacing.moduleSpace }}</span></h3>
           <el-slider v-model="spacing.moduleSpace" :step="1" :min="10" :max="30"></el-slider>
         </div>
+        <div class="page-dialog-item">
+          <h3 class="title">行间距：<span style="color: #f60">{{ spacing.lineHeight }}</span></h3>
+          <el-slider v-model="spacing.lineHeight" :step="0.05" :min="0.3" :max="1.3"></el-slider>
+        </div>
         <el-button @click="resetSpacing">重置</el-button>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -139,9 +143,9 @@
                 <span class="tag">姓名</span>
                 ：{{ resume.name }}
               </li>
-              <li v-show="resume.date" class="basic-info-item">
+              <li v-show="resume.birthDate" class="basic-info-item">
                 <span class="tag">{{ toAge ? '年龄' : '出生年月'}}</span>
-                ：{{ toAge ? monthDiff : resume.date }}
+                ：{{ toAge ? monthDiff : resume.birthDate }}
               </li>
               <li v-show="resume.gender !== '不填'" class="basic-info-item">
                 <span class="tag">性别</span>
@@ -165,19 +169,34 @@
               </li>
             </ul>
           </div>
-          <div class="module">
+          <div class="module education-bg" v-show="resume.showTeach">
             <ModuleHead :title="`教育背景`" :color="theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
-            <ul class="module-content" :style="moduleContentStyle">
-              四川大学 计算机科学与技术
-            </ul>
+            <div class="module-content" :style="moduleContentStyle">
+              <div class="education-bg-content">
+                <div v-if="resume.educationDate">
+                  {{ resume.educationDate[0] }} ~ {{ resume.educationDate[1] }}
+                </div>
+                <strong>{{ resume.schoolName }}</strong>
+                <strong>
+                  {{ resume.specialty }}{{ resume.eduDegree !== '不填' ? `（${resume.eduDegree}）` : '' }}
+                </strong>
+              </div>
+              <div :style="{lineHeight: 1 + this.spacing.lineHeight}"
+                   class="description">{{ resume.eduDescription }}</div>
+            </div>
           </div>
-          <div class="module" v-show="resume.skill">
+          <div class="module" v-show="resume.showSkill">
             <ModuleHead :title="`专业技能`" :color="theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
-            <ul class="module-content" :style="moduleContentStyle">
+            <ul class="module-content" :style="[
+              {lineHeight: 1 + this.spacing.lineHeight},
+              moduleContentStyle
+            ]">
+              <div :style="{lineHeight: 1 + this.spacing.lineHeight}"
+                   class="description">{{ resume.skillDescription }}</div>
               <li class="basic-info-item">
                 1
               </li>
@@ -192,11 +211,16 @@
               </li>
             </ul>
           </div>
-          <div class="module" v-show="resume.honor">
+          <div class="module" v-show="resume.showHonor">
             <ModuleHead :title="`荣誉证书`" :color="theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
-            <ul class="module-content" :style="moduleContentStyle">
+            <ul class="module-content" :style="[
+              {lineHeight: 1 + this.spacing.lineHeight},
+              moduleContentStyle
+            ]">
+              <div :style="{lineHeight: 1 + this.spacing.lineHeight}"
+                   class="description">{{ resume.honorDescription }}</div>
               <li class="basic-info-item">
                 ICPC贺州站银牌
               </li>
@@ -211,20 +235,41 @@
         </draggable>
       </div>
     </div>
-
-    <div class="editor-container">
+    <!--5rem = the height of .edit-top-->
+    <div class="editor-container" :style="{transform: showEditBody ? 'translateY(0)' : 'translateY(calc(100% - 5rem))'}">
       <div
         :title="showEditBody ? '收起编辑区' : '展开编辑区'"
         :class="['close','webfont',showEditBody ? 'webicon-arrowdown' : 'webicon-arrowup']"
         @click="changeShowEditBody">
       </div>
       <ul class="edit-top">
-        <EditTopItem :show.sync="resume.showBasicInfo" :title="'基本信息'"></EditTopItem>
-        <EditTopItem :show.sync="resume.skill" :title="'专业技能'"></EditTopItem>
-        <EditTopItem :show.sync="resume.honor" :title="'荣誉证书'"></EditTopItem>
+        <EditTopItem
+          :active="tabIndexes[0] === curTab"
+          @click.native="changeEditShow(tabIndexes[0])"
+          :show.sync="resume.showBasicInfo"
+          :title="'基本信息'">
+        </EditTopItem>
+        <EditTopItem
+          :active="tabIndexes[1] === curTab"
+          @click.native="changeEditShow(tabIndexes[1])"
+          :show.sync="resume.showTeach"
+          :title="'教育背景'">
+        </EditTopItem>
+        <EditTopItem
+          :active="tabIndexes[2] === curTab"
+          @click.native="changeEditShow(tabIndexes[2])"
+          :show.sync="resume.showSkill"
+          :title="'专业技能'">
+        </EditTopItem>
+        <EditTopItem
+          :active="tabIndexes[3] === curTab"
+          @click.native="changeEditShow(tabIndexes[3])"
+          :show.sync="resume.showHonor"
+          :title="'荣誉证书'">
+        </EditTopItem>
       </ul>
-      <div class="edit-body" v-show="showEditBody">
-        <ul class="basic-info-edit">
+      <div class="edit-body">
+        <ul v-show="curShowEdit === tabIndexes[0]" class="basic-info-edit">
           <li>
             <p>您的姓名</p>
             <el-input v-model="resume.name" placeholder="姓名"></el-input>
@@ -232,10 +277,10 @@
           <li>
             <p>出生年月</p>
             <el-date-picker
-              v-model="resume.date"
+              v-model="resume.birthDate"
               type="month"
               value-format="yyyy-MM"
-              :picker-options="resume.dateLegal"
+              :picker-options="resume.birthDateLegal"
               placeholder="出生年月"></el-date-picker>
             <el-checkbox v-model="toAge">转年龄</el-checkbox>
           </li>
@@ -274,6 +319,68 @@
             <el-input v-model="resume.jobIntention" placeholder="求职意向"></el-input>
           </li>
         </ul>
+        <div v-show="curShowEdit === tabIndexes[1]" class="education-bg-edit">
+          <ul class="education-info-edit">
+            <li>
+              <p>学校名称</p>
+              <el-input v-model="resume.schoolName" placeholder="学校名称"></el-input>
+            </li>
+            <li>
+              <p>所学专业</p>
+              <el-input v-model="resume.specialty" placeholder="所学专业"></el-input>
+            </li>
+            <li>
+              <p>就读时间</p>
+              <el-date-picker
+                v-model="resume.educationDate"
+                value-format="yyyy-MM"
+                type="monthrange"
+                range-separator="至"
+                start-placeholder="入学年月"
+                end-placeholder="毕业年月">
+              </el-date-picker>
+            </li>
+            <li>
+              <p>学历</p>
+              <el-select v-model="resume.eduDegree" placeholder="学历">
+                <el-option
+                  v-for="item in eduDegrees"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </li>
+          </ul>
+          <div>
+            <el-input
+              type="textarea"
+              :autosize="{minRows: 6,maxRows: 6}"
+              v-model="resume.eduDescription"
+              placeholder="所修课程、成绩排名、在校的职务、参赛获奖情况等有利于突出个人优势的信息。尽量简洁，突出重点。">
+            </el-input>
+          </div>
+        </div>
+        <div v-show="curShowEdit === tabIndexes[2]" class="skill-edit">
+          <div>
+            <el-input
+              type="textarea"
+              :autosize="{minRows: 6,maxRows: 6}"
+              v-model="resume.skillDescription"
+              placeholder="技能特长文字描述，非必填。">
+            </el-input>
+          </div>
+        </div>
+        <div v-show="curShowEdit === tabIndexes[3]" class="honor-edit">
+          <div>
+            <el-input
+              type="textarea"
+              :autosize="{minRows: 6,maxRows: 6}"
+              v-model="resume.honorDescription"
+              placeholder="荣誉证书内容描述，非必填。">
+            </el-input>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -301,7 +408,8 @@ export default {
       },
       spacing: {
         padding: 32,
-        moduleSpace: 20
+        moduleSpace: 20,
+        lineHeight: 0.35
       },
       fontValue: '14',
       fontValues: [
@@ -322,12 +430,16 @@ export default {
       pageDialogVisible: false,
       showEditBody: false,
       toAge: false,
+      tabIndexes: [0, 1, 2, 3],
+      curTab: 0,
+      curShowEdit: 0,
       resume: {
         title: '个人简历',
         slogan: '努力超越自己，每天进步一点点',
+        // 基本信息
         name: 'hans774882968',
-        date: '',
-        dateLegal: {
+        birthDate: '',
+        birthDateLegal: {
           disabledDate: time => {
             let now = new Date()
             if (time.getFullYear() < now.getFullYear()) return false
@@ -340,9 +452,21 @@ export default {
         email: '774882968@qq.com',
         seniority: '应届生',
         jobIntention: '前端工程师',
+        // 教育背景
+        schoolName: '四川大学',
+        specialty: '计算机科学与技术',
+        educationDate: '',
+        eduDegree: '本科',
+        eduDescription: '',
+        // 专业技能
+        skillDescription: '',
+        // 荣誉证书
+        honorDescription: '',
+        // 简历模块是否展示
         showBasicInfo: true,
-        skill: true,
-        honor: true
+        showTeach: true,
+        showSkill: true,
+        showHonor: true
       },
       seniorities: [
         {value: '不填', label: '不填'},
@@ -355,6 +479,12 @@ export default {
       ],
       genders: [
         {value: '不填', label: '不填'}, {value: '男', label: '男'}, {value: '女', label: '女'}
+      ],
+      eduDegrees: [
+        {value: '不填', label: '不填'}, {value: '中专', label: '中专'},
+        {value: '大专', label: '大专'}, {value: '本科', label: '本科'},
+        {value: '学士', label: '学士'}, {value: '硕士', label: '硕士'},
+        {value: '博士', label: '博士'}, {value: 'MBA', label: 'MBA'}
       ]
     }
   },
@@ -374,8 +504,8 @@ export default {
       return `rgb(${r - 40},${g - 40},${b - 40})`
     },
     monthDiff () {
-      if (!this.resume.date) return null
-      const st = new Date(this.resume.date)
+      if (!this.resume.birthDate) return null
+      const st = new Date(this.resume.birthDate)
       const ed = new Date()
       let year = ed.getFullYear() - st.getFullYear()
       let month = ed.getMonth() - st.getMonth()
@@ -388,7 +518,7 @@ export default {
   },
   methods: {
     resetSpacing () {
-      this.spacing = {padding: 32, moduleSpace: 20}
+      this.spacing = {padding: 32, moduleSpace: 20, lineHeight: 0.35}
     },
     updateSkinColor (idx) {
       this.colorIndex = idx
@@ -396,6 +526,10 @@ export default {
     },
     changeShowEditBody () {
       this.showEditBody = !this.showEditBody
+    },
+    changeEditShow (idx) {
+      this.curTab = idx
+      this.curShowEdit = idx
     }
   }
 }
@@ -583,6 +717,7 @@ export default {
     padding: 1.25rem;
   }
   .basic-info .module-content{
+    line-height: normal;/*不受全局的lineHeight设置影响*/
     display: grid;
     grid-template-columns: repeat(2,1fr);
   }
@@ -595,6 +730,13 @@ export default {
     width: 4rem;
     text-align-last: justify;/* 两端对齐 */
   }
+  .education-bg-content{
+    display: flex;
+    justify-content: space-between;
+  }
+  .module .description{
+    white-space: pre-wrap;
+  }
 
   .editor-container{
     width: 100%;
@@ -603,6 +745,7 @@ export default {
     bottom: 0;
     background-color: white;
     box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    transition: all 0.3s;
   }
   .close{
     position: absolute;
@@ -635,20 +778,21 @@ export default {
     width: 75rem;
     margin: 0 auto;
   }
-  .basic-info-edit{
+  .basic-info-edit,.education-info-edit{
+    margin-top: 1rem;
     display: grid;
     grid-template-columns: repeat(4,1fr);
   }
   .basic-info-edit .el-date-editor{
     width: 120px;/* 日期选择器宽度限制 */
   }
-  .basic-info-edit li{
+  .basic-info-edit li,.education-bg-edit li{
     display: flex;
     align-items: center;
     padding: 0.5rem 1rem;
     column-gap: 0.5rem;
   }
-  .basic-info-edit p{
+  .basic-info-edit p,.education-bg-edit p{
     min-width: 72px;
     text-align: right;
   }

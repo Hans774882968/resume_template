@@ -1,11 +1,11 @@
 <template>
   <li class="container" :style="{
-      borderBottom: show ? '' : '2px solid #ddd',
-      color: show ? '' : '#ddd'
+      borderBottom: show && active ? '' : '2px solid #ddd',
+      color: show ? (!active ? '' : '#f60') : '#ddd'
     }">
     <el-tooltip :content="remind" placement="top">
       <el-switch
-        v-model="tmp"
+        v-model="tmpShow"
         active-color="rgb(19,206,102)">
       </el-switch>
     </el-tooltip>
@@ -18,23 +18,24 @@ export default {
   name: 'EditTopItem',
   props: {
     show: Boolean,
-    title: String
+    title: String,
+    active: Boolean
   },
   computed: {
     remind () {
-      return this.tmp ? '点击可隐藏模块' : '点击可显示模块'
+      return this.tmpShow ? '点击可隐藏模块' : '点击可显示模块'
     }
   },
   data () {
     return {
-      tmp: this.show
+      tmpShow: this.show
     }
   },
   watch: {
     show (val) {
-      this.tmp = val
+      this.tmpShow = val
     },
-    tmp (val) {
+    tmpShow (val) {
       this.$emit('update:show', val)
     }
   }
