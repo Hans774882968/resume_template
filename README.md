@@ -25,6 +25,9 @@ npm install html2canvas jspdf --save
 
 #简历模块拖拽功能
 npm install vuedraggable --save
+
+#富文本
+npm install vue-quill-editor --save
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
@@ -37,4 +40,5 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 - 支持通过拖拽简历模块，调整模块顺序
 - 可以隐藏模块
 - 可以编辑基本信息
-- 目前可以调整间距
+- 可以调整间距
+- 目前支持富文本

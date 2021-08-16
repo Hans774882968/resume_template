@@ -109,16 +109,7 @@
           </dl>
         </div>
 
-        <div class="line-box">
-          <div class="line-l" :style="{backgroundColor: theme.color}">
-            <div class="line-l-triangle"
-                 :style="{borderColor: `transparent transparent transparent ${theme.color}`}">
-            </div>
-          </div>
-          <div class="line-r">
-            <div class="line-r-triangle"></div>
-          </div>
-        </div>
+        <ResumeSeparator :themeColor="theme.color"></ResumeSeparator>
 
         <draggable
           class="resume-body"
@@ -135,7 +126,7 @@
             ghostClass: 'ghost'
           }">
           <div class="module basic-info" v-show="resume.showBasicInfo">
-            <ModuleHead :title="`基本信息`" :color="theme.color"
+            <ModuleHead title="基本信息" :color="theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
             <ul class="module-content" :style="moduleContentStyle">
@@ -170,7 +161,7 @@
             </ul>
           </div>
           <div class="module education-bg" v-show="resume.showTeach">
-            <ModuleHead :title="`教育背景`" :color="theme.color"
+            <ModuleHead title="教育背景" :color="theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
             <div class="module-content" :style="moduleContentStyle">
@@ -183,53 +174,39 @@
                   {{ resume.specialty }}{{ resume.eduDegree !== '不填' ? `（${resume.eduDegree}）` : '' }}
                 </strong>
               </div>
-              <div :style="{lineHeight: 1 + this.spacing.lineHeight}"
-                   class="description">{{ resume.eduDescription }}</div>
+              <DescriptionShow
+                :description="resume.eduDescription"
+                :lineHeight="this.spacing.lineHeight"
+                marginTop="1rem">
+              </DescriptionShow>
             </div>
           </div>
           <div class="module" v-show="resume.showSkill">
-            <ModuleHead :title="`专业技能`" :color="theme.color"
+            <ModuleHead title="专业技能" :color="theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
             <ul class="module-content" :style="[
               {lineHeight: 1 + this.spacing.lineHeight},
               moduleContentStyle
             ]">
-              <div :style="{lineHeight: 1 + this.spacing.lineHeight}"
-                   class="description">{{ resume.skillDescription }}</div>
-              <li class="basic-info-item">
-                1
-              </li>
-              <li class="basic-info-item">
-                2
-              </li>
-              <li class="basic-info-item">
-                3
-              </li>
-              <li class="basic-info-item">
-                4
-              </li>
+              <DescriptionShow
+                :description="resume.skillDescription"
+                :lineHeight="this.spacing.lineHeight">
+              </DescriptionShow>
             </ul>
           </div>
           <div class="module" v-show="resume.showHonor">
-            <ModuleHead :title="`荣誉证书`" :color="theme.color"
+            <ModuleHead title="荣誉证书" :color="theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
             <ul class="module-content" :style="[
               {lineHeight: 1 + this.spacing.lineHeight},
               moduleContentStyle
             ]">
-              <div :style="{lineHeight: 1 + this.spacing.lineHeight}"
-                   class="description">{{ resume.honorDescription }}</div>
-              <li class="basic-info-item">
-                ICPC贺州站银牌
-              </li>
-              <li class="basic-info-item">
-                蓝桥杯国一
-              </li>
-              <li class="basic-info-item">
-                连续三年获得国家奖学金
-              </li>
+              <DescriptionShow
+                :description="resume.honorDescription"
+                :lineHeight="this.spacing.lineHeight">
+              </DescriptionShow>
             </ul>
           </div>
         </draggable>
@@ -247,25 +224,25 @@
           :active="tabIndexes[0] === curTab"
           @click.native="changeEditShow(tabIndexes[0])"
           :show.sync="resume.showBasicInfo"
-          :title="'基本信息'">
+          title="基本信息">
         </EditTopItem>
         <EditTopItem
           :active="tabIndexes[1] === curTab"
           @click.native="changeEditShow(tabIndexes[1])"
           :show.sync="resume.showTeach"
-          :title="'教育背景'">
+          title="教育背景">
         </EditTopItem>
         <EditTopItem
           :active="tabIndexes[2] === curTab"
           @click.native="changeEditShow(tabIndexes[2])"
           :show.sync="resume.showSkill"
-          :title="'专业技能'">
+          title="专业技能">
         </EditTopItem>
         <EditTopItem
           :active="tabIndexes[3] === curTab"
           @click.native="changeEditShow(tabIndexes[3])"
           :show.sync="resume.showHonor"
-          :title="'荣誉证书'">
+          title="荣誉证书">
         </EditTopItem>
       </ul>
       <div class="edit-body">
@@ -352,34 +329,19 @@
               </el-select>
             </li>
           </ul>
-          <div>
-            <el-input
-              type="textarea"
-              :autosize="{minRows: 6,maxRows: 6}"
-              v-model="resume.eduDescription"
-              placeholder="所修课程、成绩排名、在校的职务、参赛获奖情况等有利于突出个人优势的信息。尽量简洁，突出重点。">
-            </el-input>
-          </div>
+          <Editor
+            placeholder="所修课程、成绩排名、在校的职务、参赛获奖情况等有利于突出个人优势的信息。尽量简洁，突出重点。"
+            :content.sync="resume.eduDescription"></Editor>
         </div>
         <div v-show="curShowEdit === tabIndexes[2]" class="skill-edit">
-          <div>
-            <el-input
-              type="textarea"
-              :autosize="{minRows: 6,maxRows: 6}"
-              v-model="resume.skillDescription"
-              placeholder="技能特长文字描述，非必填。">
-            </el-input>
-          </div>
+          <Editor
+            placeholder="技能特长文字描述，非必填。"
+            :content.sync="resume.skillDescription"></Editor>
         </div>
         <div v-show="curShowEdit === tabIndexes[3]" class="honor-edit">
-          <div>
-            <el-input
-              type="textarea"
-              :autosize="{minRows: 6,maxRows: 6}"
-              v-model="resume.honorDescription"
-              placeholder="荣誉证书内容描述，非必填。">
-            </el-input>
-          </div>
+          <Editor
+            placeholder="荣誉证书内容描述，非必填。"
+            :content.sync="resume.honorDescription"></Editor>
         </div>
       </div>
     </div>
@@ -392,10 +354,13 @@ import Navbar from './Navbar'
 import FAQ from './FAQ'
 import Draggable from 'vuedraggable'
 import EditTopItem from '@/components/EditTopItem'
+import Editor from './Editor'
+import DescriptionShow from '@/components/DescriptionShow'
+import ResumeSeparator from '@/components/ResumeSeparator'
 
 export default {
   name: 'Index',
-  components: {EditTopItem, ModuleHead, Navbar, FAQ, Draggable},
+  components: {ResumeSeparator, DescriptionShow, EditTopItem, ModuleHead, Navbar, FAQ, Draggable, Editor},
   data () {
     return {
       colorIndex: 0,
@@ -662,48 +627,6 @@ export default {
     font-size: 14px;
   }
 
-  .line-box{
-    height: 1rem;
-    display: flex;
-    justify-content: space-between;
-  }
-  .line-box .line-l,.line-box .line-r{
-    position: relative;
-  }
-  .line-box .line-l{
-    width: 60%;
-    height: 100%;
-  }
-  .line-l-triangle{
-    position: absolute;/* 实现直角三角形 */
-    left: 100%;
-    display: block;
-    width: 0;
-    height: 0;
-    overflow: hidden;
-    border-style: solid;
-    border-width: 1rem 0 0 1rem;
-  }
-  .line-box .line-r{
-    margin-top: 0.3rem;
-    flex: 1;
-    margin-left: 1.5rem;
-    background-color: #c19f67;
-  }
-  .line-r-triangle{
-    position: absolute;/* 实现直角三角形 */
-    right: 100%;
-    top: 0;
-    display: block;
-    width: 0;
-    height: 0;
-    overflow: hidden;
-    border-style: solid;
-    --w: calc(1rem - 0.3rem);
-    border-width: var(--w) 0 0 var(--w);
-    border-color: #c19f67 transparent transparent transparent;
-  }
-
   .resume-body{
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
@@ -733,9 +656,6 @@ export default {
   .education-bg-content{
     display: flex;
     justify-content: space-between;
-  }
-  .module .description{
-    white-space: pre-wrap;
   }
 
   .editor-container{
@@ -779,9 +699,11 @@ export default {
     margin: 0 auto;
   }
   .basic-info-edit,.education-info-edit{
-    margin-top: 1rem;
     display: grid;
     grid-template-columns: repeat(4,1fr);
+  }
+  .basic-info-edit{
+    margin: 1rem 0;
   }
   .basic-info-edit .el-date-editor{
     width: 120px;/* 日期选择器宽度限制 */
@@ -795,5 +717,15 @@ export default {
   .basic-info-edit p,.education-bg-edit p{
     min-width: 72px;
     text-align: right;
+  }
+  .education-bg-edit{
+    padding-top: 1rem;
+    padding-bottom: 1.5rem;
+  }
+  .education-info-edit{
+    margin-bottom: 1rem;
+  }
+  .skill-edit,.honor-edit{
+    padding: 1.5rem 0;
   }
 </style>
