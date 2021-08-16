@@ -41,4 +41,5 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 - 可以隐藏模块
 - 可以编辑基本信息
 - 可以调整间距
-- 目前支持富文本
+- 支持富文本编辑
+- 新增项目经历编辑功能

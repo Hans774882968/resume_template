@@ -132,7 +132,7 @@
             <ul class="module-content" :style="moduleContentStyle">
               <li v-show="resume.name.length > 0" class="basic-info-item">
                 <span class="tag">姓名</span>
-                ：{{ resume.name }}
+                ：<span style="color: red;font-weight: bold;">{{ resume.name }}</span>
               </li>
               <li v-show="resume.birthDate" class="basic-info-item">
                 <span class="tag">{{ toAge ? '年龄' : '出生年月'}}</span>
@@ -180,6 +180,31 @@
                 marginTop="1rem">
               </DescriptionShow>
             </div>
+          </div>
+          <div class="module" v-show="resume.showProject">
+            <ModuleHead title="项目经历" :color="theme.color"
+                        :darkerColor="darkerColor">
+            </ModuleHead>
+            <ul class="module-content" :style="[
+              {lineHeight: 1 + this.spacing.lineHeight},
+              moduleContentStyle
+            ]">
+              <li v-for="(project,idx) in resume.projects" :key="idx">
+                <div class="project-item-content">
+                  <div v-if="project.pDate">
+                    {{ project.pDate[0] }} ~ {{ project.pDate[1] }}
+                  </div>
+                  <strong>{{ project.name }}</strong>
+                  <strong v-show="project.role">{{ project.role }}</strong>
+                </div>
+                <DescriptionShow
+                  :description="project.content"
+                  :lineHeight="spacing.lineHeight"
+                  marginTop="1rem"
+                  marginBottom="1rem">
+                </DescriptionShow>
+              </li>
+            </ul>
           </div>
           <div class="module" v-show="resume.showSkill">
             <ModuleHead title="专业技能" :color="theme.color"
@@ -235,12 +260,18 @@
         <EditTopItem
           :active="tabIndexes[2] === curTab"
           @click.native="changeEditShow(tabIndexes[2])"
-          :show.sync="resume.showSkill"
-          title="专业技能">
+          :show.sync="resume.showProject"
+          title="项目经历">
         </EditTopItem>
         <EditTopItem
           :active="tabIndexes[3] === curTab"
           @click.native="changeEditShow(tabIndexes[3])"
+          :show.sync="resume.showSkill"
+          title="专业技能">
+        </EditTopItem>
+        <EditTopItem
+          :active="tabIndexes[4] === curTab"
+          @click.native="changeEditShow(tabIndexes[4])"
           :show.sync="resume.showHonor"
           title="荣誉证书">
         </EditTopItem>
@@ -333,12 +364,43 @@
             placeholder="所修课程、成绩排名、在校的职务、参赛获奖情况等有利于突出个人优势的信息。尽量简洁，突出重点。"
             :content.sync="resume.eduDescription"></Editor>
         </div>
-        <div v-show="curShowEdit === tabIndexes[2]" class="skill-edit">
+        <div v-show="curShowEdit === tabIndexes[2]" class="project-edit">
+          <div class="project-item-edit" v-for="(project,idx) in resume.projects" :key="idx">
+            <ul class="project-info-edit">
+              <li>
+                <p>项目名称</p>
+                <el-input v-model="project.name" placeholder="项目名称"></el-input>
+              </li>
+              <li>
+                <p>项目角色</p>
+                <el-input v-model="project.role" placeholder="项目角色"></el-input>
+              </li>
+              <li>
+                <p>项目时间</p>
+                <el-date-picker
+                  v-model="project.pDate"
+                  value-format="yyyy-MM"
+                  type="monthrange"
+                  range-separator="至"
+                  start-placeholder="开始年月"
+                  end-placeholder="结束年月">
+                </el-date-picker>
+              </li>
+            </ul>
+            <Editor
+              placeholder="请输入项目内容、成果和感悟，简洁突出重点。"
+              :content.sync="project.content"></Editor>
+          </div>
+          <el-button type="primary" class="btn-add" @click="addProject()">
+            <i class="el-icon-plus"></i> 添加一条：项目经历
+          </el-button>
+        </div>
+        <div v-show="curShowEdit === tabIndexes[3]" class="skill-edit">
           <Editor
             placeholder="技能特长文字描述，非必填。"
             :content.sync="resume.skillDescription"></Editor>
         </div>
-        <div v-show="curShowEdit === tabIndexes[3]" class="honor-edit">
+        <div v-show="curShowEdit === tabIndexes[4]" class="honor-edit">
           <Editor
             placeholder="荣誉证书内容描述，非必填。"
             :content.sync="resume.honorDescription"></Editor>
@@ -357,6 +419,15 @@ import EditTopItem from '@/components/EditTopItem'
 import Editor from './Editor'
 import DescriptionShow from '@/components/DescriptionShow'
 import ResumeSeparator from '@/components/ResumeSeparator'
+
+class Project {
+  constructor () {
+    this.name = ''
+    this.role = ''
+    this.pDate = ''
+    this.content = ''
+  }
+}
 
 export default {
   name: 'Index',
@@ -395,7 +466,7 @@ export default {
       pageDialogVisible: false,
       showEditBody: false,
       toAge: false,
-      tabIndexes: [0, 1, 2, 3],
+      tabIndexes: [0, 1, 2, 3, 4],
       curTab: 0,
       curShowEdit: 0,
       resume: {
@@ -423,6 +494,8 @@ export default {
         educationDate: '',
         eduDegree: '本科',
         eduDescription: '',
+        // 项目经历
+        projects: [new Project()],
         // 专业技能
         skillDescription: '',
         // 荣誉证书
@@ -430,6 +503,7 @@ export default {
         // 简历模块是否展示
         showBasicInfo: true,
         showTeach: true,
+        showProject: true,
         showSkill: true,
         showHonor: true
       },
@@ -482,6 +556,9 @@ export default {
     }
   },
   methods: {
+    addProject () {
+      this.resume.projects.push(new Project())
+    },
     resetSpacing () {
       this.spacing = {padding: 32, moduleSpace: 20, lineHeight: 0.35}
     },
@@ -657,6 +734,10 @@ export default {
     display: flex;
     justify-content: space-between;
   }
+  .project-item-content{
+    display: flex;
+    justify-content: space-between;
+  }
 
   .editor-container{
     width: 100%;
@@ -698,23 +779,24 @@ export default {
     width: 75rem;
     margin: 0 auto;
   }
-  .basic-info-edit,.education-info-edit{
-    display: grid;
-    grid-template-columns: repeat(4,1fr);
-  }
   .basic-info-edit{
     margin: 1rem 0;
+  }
+  /* .basic-info-edit,.education-info-edit,.project-info-edit共享样式 */
+  .basic-info-edit,.education-info-edit,.project-info-edit{
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
   }
   .basic-info-edit .el-date-editor{
     width: 120px;/* 日期选择器宽度限制 */
   }
-  .basic-info-edit li,.education-bg-edit li{
+  .basic-info-edit li,.education-bg-edit li,.project-edit li{
     display: flex;
     align-items: center;
     padding: 0.5rem 1rem;
     column-gap: 0.5rem;
   }
-  .basic-info-edit p,.education-bg-edit p{
+  .basic-info-edit p,.education-bg-edit p,.project-edit p{
     min-width: 72px;
     text-align: right;
   }
@@ -722,8 +804,19 @@ export default {
     padding-top: 1rem;
     padding-bottom: 1.5rem;
   }
-  .education-info-edit{
+  .education-info-edit,.project-info-edit{
     margin-bottom: 1rem;
+  }
+  .project-edit {
+    max-height: 20rem;
+    overflow-y: scroll;
+  }
+  .project-item-edit{
+    padding-top: 1rem;
+    padding-right: 1.5rem;
+  }
+  .project-edit .btn-add{
+    margin: 1rem 0 1.5rem;
   }
   .skill-edit,.honor-edit{
     padding: 1.5rem 0;

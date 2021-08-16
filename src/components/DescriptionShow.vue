@@ -1,7 +1,7 @@
 <template>
   <div class="description-show ql-container ql-snow"
        v-show="description"
-       :style="{marginTop: marginTop}">
+       :style="{marginTop: marginTop,marginBottom: marginBottom}">
     <div class="ql-editor">
       <div :style="{lineHeight: 1 + lineHeight}"
            class="description"
@@ -17,6 +17,11 @@ export default {
     description: String,
     lineHeight: Number,
     marginTop: {
+      type: String,
+      required: false,
+      default: ''
+    },
+    marginBottom: {
       type: String,
       required: false,
       default: ''
