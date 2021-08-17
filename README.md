@@ -42,4 +42,4 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 - 可以编辑基本信息
 - 可以调整间距
 - 支持富文本编辑
-- 新增项目经历编辑功能
+- 教育经历功能更新

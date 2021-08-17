@@ -132,7 +132,7 @@
             <ul class="module-content" :style="moduleContentStyle">
               <li v-show="resume.name.length > 0" class="basic-info-item">
                 <span class="tag">姓名</span>
-                ：<span style="color: red;font-weight: bold;">{{ resume.name }}</span>
+                ：<span :class="{'red-name': toRedName}">{{ resume.name }}</span>
               </li>
               <li v-show="resume.birthDate" class="basic-info-item">
                 <span class="tag">{{ toAge ? '年龄' : '出生年月'}}</span>
@@ -164,29 +164,35 @@
             <ModuleHead title="教育背景" :color="theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
-            <div class="module-content" :style="moduleContentStyle">
-              <div class="education-bg-content">
-                <div v-if="resume.educationDate">
-                  {{ resume.educationDate[0] }} ~ {{ resume.educationDate[1] }}
+            <ul class="module-content" :style="[
+              {lineHeight: 1 + spacing.lineHeight},
+              moduleContentStyle
+            ]">
+              <li v-for="(edu,idx) in resume.educations" :key="idx">
+                <div class="education-item-content">
+                  <div class="time" v-if="edu.eDate">
+                    {{ edu.eDate[0] }} ~ {{ edu.eDate[1] }}
+                  </div>
+                  <strong class="school">{{ edu.schoolName }}</strong>
+                  <strong class="specialty">
+                    {{ edu.specialty }}{{ edu.degree !== '不填' ? `（${edu.degree}）` : '' }}
+                  </strong>
                 </div>
-                <strong>{{ resume.schoolName }}</strong>
-                <strong>
-                  {{ resume.specialty }}{{ resume.eduDegree !== '不填' ? `（${resume.eduDegree}）` : '' }}
-                </strong>
-              </div>
-              <DescriptionShow
-                :description="resume.eduDescription"
-                :lineHeight="this.spacing.lineHeight"
-                marginTop="1rem">
-              </DescriptionShow>
-            </div>
+                <DescriptionShow
+                  :description="edu.description"
+                  :lineHeight="spacing.lineHeight"
+                  marginTop="1rem"
+                  marginBottom="1rem">
+                </DescriptionShow>
+              </li>
+            </ul>
           </div>
           <div class="module" v-show="resume.showProject">
             <ModuleHead title="项目经历" :color="theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
             <ul class="module-content" :style="[
-              {lineHeight: 1 + this.spacing.lineHeight},
+              {lineHeight: 1 + spacing.lineHeight},
               moduleContentStyle
             ]">
               <li v-for="(project,idx) in resume.projects" :key="idx">
@@ -211,12 +217,12 @@
                         :darkerColor="darkerColor">
             </ModuleHead>
             <ul class="module-content" :style="[
-              {lineHeight: 1 + this.spacing.lineHeight},
+              {lineHeight: 1 + spacing.lineHeight},
               moduleContentStyle
             ]">
               <DescriptionShow
                 :description="resume.skillDescription"
-                :lineHeight="this.spacing.lineHeight">
+                :lineHeight="spacing.lineHeight">
               </DescriptionShow>
             </ul>
           </div>
@@ -225,12 +231,12 @@
                         :darkerColor="darkerColor">
             </ModuleHead>
             <ul class="module-content" :style="[
-              {lineHeight: 1 + this.spacing.lineHeight},
+              {lineHeight: 1 + spacing.lineHeight},
               moduleContentStyle
             ]">
               <DescriptionShow
                 :description="resume.honorDescription"
-                :lineHeight="this.spacing.lineHeight">
+                :lineHeight="spacing.lineHeight">
               </DescriptionShow>
             </ul>
           </div>
@@ -281,6 +287,7 @@
           <li>
             <p>您的姓名</p>
             <el-input v-model="resume.name" placeholder="姓名"></el-input>
+            <el-checkbox v-model="toRedName">红名</el-checkbox>
           </li>
           <li>
             <p>出生年月</p>
@@ -328,41 +335,46 @@
           </li>
         </ul>
         <div v-show="curShowEdit === tabIndexes[1]" class="education-bg-edit">
-          <ul class="education-info-edit">
-            <li>
-              <p>学校名称</p>
-              <el-input v-model="resume.schoolName" placeholder="学校名称"></el-input>
-            </li>
-            <li>
-              <p>所学专业</p>
-              <el-input v-model="resume.specialty" placeholder="所学专业"></el-input>
-            </li>
-            <li>
-              <p>就读时间</p>
-              <el-date-picker
-                v-model="resume.educationDate"
-                value-format="yyyy-MM"
-                type="monthrange"
-                range-separator="至"
-                start-placeholder="入学年月"
-                end-placeholder="毕业年月">
-              </el-date-picker>
-            </li>
-            <li>
-              <p>学历</p>
-              <el-select v-model="resume.eduDegree" placeholder="学历">
-                <el-option
-                  v-for="item in eduDegrees"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
-                </el-option>
-              </el-select>
-            </li>
-          </ul>
-          <Editor
-            placeholder="所修课程、成绩排名、在校的职务、参赛获奖情况等有利于突出个人优势的信息。尽量简洁，突出重点。"
-            :content.sync="resume.eduDescription"></Editor>
+          <div class="education-item-edit" v-for="(edu,idx) in resume.educations" :key="idx">
+            <ul class="education-info-edit">
+              <li>
+                <p>学校名称</p>
+                <el-input v-model="edu.schoolName" placeholder="学校名称"></el-input>
+              </li>
+              <li>
+                <p>所学专业</p>
+                <el-input v-model="edu.specialty" placeholder="所学专业"></el-input>
+              </li>
+              <li>
+                <p>就读时间</p>
+                <el-date-picker
+                  v-model="edu.eDate"
+                  value-format="yyyy-MM"
+                  type="monthrange"
+                  range-separator="至"
+                  start-placeholder="入学年月"
+                  end-placeholder="毕业年月">
+                </el-date-picker>
+              </li>
+              <li>
+                <p>学历</p>
+                <el-select v-model="edu.degree" placeholder="学历">
+                  <el-option
+                    v-for="item in eduDegrees"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+              </li>
+            </ul>
+            <Editor
+              placeholder="所修课程、成绩排名、在校的职务、参赛获奖情况等有利于突出个人优势的信息。尽量简洁，突出重点。"
+              :content.sync="edu.description"></Editor>
+          </div>
+          <el-button type="primary" class="btn-add" @click="addEducation">
+            <i class="el-icon-plus"></i> 添加一条：教育背景
+          </el-button>
         </div>
         <div v-show="curShowEdit === tabIndexes[2]" class="project-edit">
           <div class="project-item-edit" v-for="(project,idx) in resume.projects" :key="idx">
@@ -391,7 +403,7 @@
               placeholder="请输入项目内容、成果和感悟，简洁突出重点。"
               :content.sync="project.content"></Editor>
           </div>
-          <el-button type="primary" class="btn-add" @click="addProject()">
+          <el-button type="primary" class="btn-add" @click="addProject">
             <i class="el-icon-plus"></i> 添加一条：项目经历
           </el-button>
         </div>
@@ -419,6 +431,16 @@ import EditTopItem from '@/components/EditTopItem'
 import Editor from './Editor'
 import DescriptionShow from '@/components/DescriptionShow'
 import ResumeSeparator from '@/components/ResumeSeparator'
+
+class Education {
+  constructor (schoolName = '', specialty = '', degree = '不填') {
+    this.schoolName = schoolName
+    this.specialty = specialty
+    this.eDate = ''
+    this.degree = degree
+    this.description = ''
+  }
+}
 
 class Project {
   constructor () {
@@ -465,6 +487,7 @@ export default {
       resumeTitleDialogVisible: false,
       pageDialogVisible: false,
       showEditBody: false,
+      toRedName: false, /* cf红名（大雾） */
       toAge: false,
       tabIndexes: [0, 1, 2, 3, 4],
       curTab: 0,
@@ -489,11 +512,7 @@ export default {
         seniority: '应届生',
         jobIntention: '前端工程师',
         // 教育背景
-        schoolName: '四川大学',
-        specialty: '计算机科学与技术',
-        educationDate: '',
-        eduDegree: '本科',
-        eduDescription: '',
+        educations: [new Education('四川大学', '计算机科学与技术', '本科')],
         // 项目经历
         projects: [new Project()],
         // 专业技能
@@ -556,6 +575,9 @@ export default {
     }
   },
   methods: {
+    addEducation () {
+      this.resume.educations.push(new Education())
+    },
     addProject () {
       this.resume.projects.push(new Project())
     },
@@ -730,11 +752,12 @@ export default {
     width: 4rem;
     text-align-last: justify;/* 两端对齐 */
   }
-  .education-bg-content{
-    display: flex;
-    justify-content: space-between;
+  /* cf红名（大雾） */
+  .basic-info-item .red-name {
+    color: red;
+    font-weight: bold;
   }
-  .project-item-content{
+  .education-item-content,.project-item-content{
     display: flex;
     justify-content: space-between;
   }
@@ -779,6 +802,7 @@ export default {
     width: 75rem;
     margin: 0 auto;
   }
+
   .basic-info-edit{
     margin: 1rem 0;
   }
@@ -800,24 +824,23 @@ export default {
     min-width: 72px;
     text-align: right;
   }
-  .education-bg-edit{
+
+  /* .education-bg-edit,.project-edit共享样式 */
+  .education-bg-edit,.project-edit{
+    max-height: 20rem;
+    overflow-y: scroll;
+  }
+  .education-item-edit,.project-item-edit{
     padding-top: 1rem;
-    padding-bottom: 1.5rem;
+    padding-right: 1.5rem;
   }
   .education-info-edit,.project-info-edit{
     margin-bottom: 1rem;
   }
-  .project-edit {
-    max-height: 20rem;
-    overflow-y: scroll;
+  .education-bg-edit .btn-add,.project-edit .btn-add{
+    margin: 1.5rem 0;
   }
-  .project-item-edit{
-    padding-top: 1rem;
-    padding-right: 1.5rem;
-  }
-  .project-edit .btn-add{
-    margin: 1rem 0 1.5rem;
-  }
+
   .skill-edit,.honor-edit{
     padding: 1.5rem 0;
   }
