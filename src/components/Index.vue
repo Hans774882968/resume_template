@@ -252,38 +252,38 @@
       </div>
       <ul class="edit-top">
         <EditTopItem
-          :active="tabIndexes[0] === curTab"
-          @click.native="changeEditShow(tabIndexes[0])"
+          :active="tabIndexes[0] === showingTab"
+          @click.native="changeShowingTab(tabIndexes[0])"
           :show.sync="resume.showBasicInfo"
           title="基本信息">
         </EditTopItem>
         <EditTopItem
-          :active="tabIndexes[1] === curTab"
-          @click.native="changeEditShow(tabIndexes[1])"
+          :active="tabIndexes[1] === showingTab"
+          @click.native="changeShowingTab(tabIndexes[1])"
           :show.sync="resume.showTeach"
           title="教育背景">
         </EditTopItem>
         <EditTopItem
-          :active="tabIndexes[2] === curTab"
-          @click.native="changeEditShow(tabIndexes[2])"
+          :active="tabIndexes[2] === showingTab"
+          @click.native="changeShowingTab(tabIndexes[2])"
           :show.sync="resume.showProject"
           title="项目经历">
         </EditTopItem>
         <EditTopItem
-          :active="tabIndexes[3] === curTab"
-          @click.native="changeEditShow(tabIndexes[3])"
+          :active="tabIndexes[3] === showingTab"
+          @click.native="changeShowingTab(tabIndexes[3])"
           :show.sync="resume.showSkill"
           title="专业技能">
         </EditTopItem>
         <EditTopItem
-          :active="tabIndexes[4] === curTab"
-          @click.native="changeEditShow(tabIndexes[4])"
+          :active="tabIndexes[4] === showingTab"
+          @click.native="changeShowingTab(tabIndexes[4])"
           :show.sync="resume.showHonor"
           title="荣誉证书">
         </EditTopItem>
       </ul>
       <div class="edit-body">
-        <ul v-show="curShowEdit === tabIndexes[0]" class="basic-info-edit">
+        <ul v-show="showingTab === tabIndexes[0]" class="basic-info-edit">
           <li>
             <p>您的姓名</p>
             <el-input v-model="resume.name" placeholder="姓名"></el-input>
@@ -334,7 +334,7 @@
             <el-input v-model="resume.jobIntention" placeholder="求职意向"></el-input>
           </li>
         </ul>
-        <div v-show="curShowEdit === tabIndexes[1]" class="education-bg-edit">
+        <div v-show="showingTab === tabIndexes[1]" class="education-bg-edit">
           <div class="education-item-edit" v-for="(edu,idx) in resume.educations" :key="idx">
             <ul class="education-info-edit">
               <li>
@@ -376,7 +376,7 @@
             <i class="el-icon-plus"></i> 添加一条：教育背景
           </el-button>
         </div>
-        <div v-show="curShowEdit === tabIndexes[2]" class="project-edit">
+        <div v-show="showingTab === tabIndexes[2]" class="project-edit">
           <div class="project-item-edit" v-for="(project,idx) in resume.projects" :key="idx">
             <ul class="project-info-edit">
               <li>
@@ -407,12 +407,12 @@
             <i class="el-icon-plus"></i> 添加一条：项目经历
           </el-button>
         </div>
-        <div v-show="curShowEdit === tabIndexes[3]" class="skill-edit">
+        <div v-show="showingTab === tabIndexes[3]" class="skill-edit">
           <Editor
             placeholder="技能特长文字描述，非必填。"
             :content.sync="resume.skillDescription"></Editor>
         </div>
-        <div v-show="curShowEdit === tabIndexes[4]" class="honor-edit">
+        <div v-show="showingTab === tabIndexes[4]" class="honor-edit">
           <Editor
             placeholder="荣誉证书内容描述，非必填。"
             :content.sync="resume.honorDescription"></Editor>
@@ -486,12 +486,9 @@ export default {
       fontDialogVisible: false,
       resumeTitleDialogVisible: false,
       pageDialogVisible: false,
-      showEditBody: false,
       toRedName: false, /* cf红名（大雾） */
       toAge: false,
       tabIndexes: [0, 1, 2, 3, 4],
-      curTab: 0,
-      curShowEdit: 0,
       resume: {
         title: '个人简历',
         slogan: '努力超越自己，每天进步一点点',
@@ -572,6 +569,12 @@ export default {
         month += 12
       }
       return year
+    },
+    showingTab () {
+      return this.$store.state.showingTab
+    },
+    showEditBody () {
+      return this.$store.state.showEditBody
     }
   },
   methods: {
@@ -589,11 +592,10 @@ export default {
       this.theme.color = this.skinColors[idx]
     },
     changeShowEditBody () {
-      this.showEditBody = !this.showEditBody
+      this.$store.commit('changeShowEditBody')
     },
-    changeEditShow (idx) {
-      this.curTab = idx
-      this.curShowEdit = idx
+    changeShowingTab (idx) {
+      this.$store.commit('changeShowingTab', idx)
     }
   }
 }

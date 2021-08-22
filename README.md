@@ -28,6 +28,9 @@ npm install vuedraggable --save
 
 #富文本
 npm install vue-quill-editor --save
+
+#vuex
+npm install vuex --save
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
@@ -43,3 +46,4 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 - 可以调整间距
 - 支持富文本编辑
 - 教育经历功能更新
+- 配置vuex
