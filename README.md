@@ -47,3 +47,4 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 - 支持富文本编辑
 - 教育经历功能更新
 - 配置vuex
+- 新增本地缓存功能

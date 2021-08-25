@@ -3,7 +3,8 @@
     <Navbar
       :fontDialogVisible.sync="fontDialogVisible"
       :resumeTitleDialogVisible.sync="resumeTitleDialogVisible"
-      :pageDialogVisible.sync="pageDialogVisible">
+      :pageDialogVisible.sync="pageDialogVisible"
+      :resume="resume">
     </Navbar>
 
     <el-dialog
@@ -286,7 +287,7 @@
         <ul v-show="showingTab === tabIndexes[0]" class="basic-info-edit">
           <li>
             <p>您的姓名</p>
-            <el-input v-model="resume.name" placeholder="姓名"></el-input>
+            <el-input v-model="resume.name" @input="updateResumeName" placeholder="姓名"></el-input>
             <el-checkbox v-model="toRedName">红名</el-checkbox>
           </li>
           <li>
@@ -577,6 +578,15 @@ export default {
       return this.$store.state.showEditBody
     }
   },
+  mounted () {
+    let resumeObj = localStorage.getItem('resume')
+    if (resumeObj) {
+      resumeObj = JSON.parse(resumeObj)
+      for (let ky in resumeObj) {
+        this.resume[ky] = resumeObj[ky]
+      }
+    }
+  },
   methods: {
     addEducation () {
       this.resume.educations.push(new Education())
@@ -590,6 +600,11 @@ export default {
     updateSkinColor (idx) {
       this.colorIndex = idx
       this.theme.color = this.skinColors[idx]
+    },
+    updateResumeName () {
+      if (this.resume.name.length === 0) {
+        this.resume.name = 'hans774882968'
+      }
     },
     changeShowEditBody () {
       this.$store.commit('changeShowEditBody')
@@ -742,12 +757,12 @@ export default {
   }
   .basic-info .module-content{
     line-height: normal;/*不受全局的lineHeight设置影响*/
-    display: grid;
-    grid-template-columns: repeat(2,1fr);
+    overflow: hidden;/* bfc */
   }
   .basic-info-item{
-    min-width: 4rem;
     padding: 3px 3px 3px 0;
+    float: left;
+    min-width: 50%;
   }
   .basic-info-item .tag{
     display: inline-block;

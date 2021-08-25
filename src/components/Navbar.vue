@@ -35,23 +35,93 @@
       <el-menu-item @mouseenter.native="bgColorMaintain">
         <el-button type="primary" @click="getPDF">导出为PDF</el-button>
       </el-menu-item>
+      <el-menu-item @mouseenter.native="bgColorMaintain">
+        <el-button type="primary" @click="saveResume">保存</el-button>
+      </el-menu-item>
+      <el-menu-item @mouseenter.native="bgColorMaintain">
+        <el-button type="primary" @click="clearResumeCache">清除缓存</el-button>
+      </el-menu-item>
     </el-menu>
   </div>
 </template>
 
 <script>
 import html2PDF from '@/html2PDF'
+import utils from '@/utils'
+
+const disableTime = 5000
 
 export default {
   name: 'Navbar',
   props: {
     fontDialogVisible: Boolean,
     resumeTitleDialogVisible: Boolean,
-    pageDialogVisible: Boolean
+    pageDialogVisible: Boolean,
+    resume: Object
+  },
+  data () {
+    return {
+      getPDF: () => {}
+    }
+  },
+  mounted () {
+    this.getPDF = utils.debounce(this,
+      disableTime,
+      '导出PDF成功',
+      `导出PDF操作不能太频繁哦，请耐心等待${disableTime / 1000}秒吧qwq`,
+      html2PDF.downloadPDF,
+      document.getElementById('resume'),
+      '我的简历')
+    this.saveResume = utils.debounce(this,
+      disableTime,
+      '',
+      `保存操作不能太频繁哦，请耐心等待${disableTime / 1000}秒吧qwq`,
+      this.saveResume)
+    this.clearResumeCache = utils.debounce(this,
+      disableTime,
+      '',
+      `清除缓存操作不能太频繁哦，请耐心等待${disableTime / 1000}秒吧qwq`,
+      this.clearResumeCache)
   },
   methods: {
-    getPDF () {
-      html2PDF.downloadPDF(document.getElementById('resume'), '我的简历')
+    saveResume () {
+      try {
+        let {title, slogan, name, birthDate, gender, phone, email,
+          seniority, jobIntention, educations, projects,
+          skillDescription, honorDescription} = this.resume
+        let resumeObj = {
+          title,
+          slogan,
+          name,
+          birthDate,
+          gender,
+          phone,
+          email,
+          seniority,
+          jobIntention,
+          educations,
+          projects,
+          skillDescription,
+          honorDescription
+        }
+        localStorage.setItem('resume', JSON.stringify(resumeObj))
+        this.$message({
+          message: '简历保存成功',
+          type: 'success'
+        })
+      } catch (e) {
+        this.$message({
+          message: '简历保存失败！localStorage已满，请精简简历内容！',
+          type: 'warning'
+        })
+      }
+    },
+    clearResumeCache () {
+      localStorage.removeItem('resume')
+      this.$message({
+        message: '简历缓存清除成功',
+        type: 'success'
+      })
     },
     bgColorMaintain (e) {
       e.target.style.backgroundColor = '#f0f8ff'
