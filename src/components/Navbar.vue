@@ -86,10 +86,13 @@ export default {
   methods: {
     saveResume () {
       try {
-        let {title, slogan, name, birthDate, gender, phone, email,
-          seniority, jobIntention, educations, projects,
+        let {theme, spacing, font, title, slogan, name, birthDate, gender,
+          phone, email, seniority, jobIntention, educations, projects,
           skillDescription, honorDescription} = this.resume
         let resumeObj = {
+          theme,
+          spacing,
+          font,
           title,
           slogan,
           name,

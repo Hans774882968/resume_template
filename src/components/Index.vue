@@ -16,14 +16,14 @@
           <li class="font-item">
             <h3 class="left-title">字体大小</h3>
             <h3 class="title-right">：</h3>
-            <el-select v-model="fontValue" placeholder="字体大小">
-              <el-option v-for="item in fontValues" :key="item.value" :label="item.label" :value="item.value"></el-option>
+            <el-select v-model="resume.font.size" placeholder="字体大小">
+              <el-option v-for="item in fontSizes" :key="item.value" :label="item.label" :value="item.value"></el-option>
             </el-select>
           </li>
           <li class="font-item">
             <h3 class="left-title">字体</h3>
             <h3 class="title-right">：</h3>
-            <el-select v-model="fontFamily" placeholder="字体">
+            <el-select v-model="resume.font.family" placeholder="字体">
               <el-option v-for="item in fontFamilies" :key="item.value" :label="item.label" :value="item.value"></el-option>
             </el-select>
           </li>
@@ -59,16 +59,16 @@
       width="30%">
       <div class="page-dialog">
         <div class="page-dialog-item">
-          <h3 class="title">页面边距：<span style="color: #f60">{{ spacing.padding }}</span></h3>
-          <el-slider v-model="spacing.padding" :step="2" :min="20" :max="50"></el-slider>
+          <h3 class="title">页面边距：<span style="color: #f60">{{ resume.spacing.padding }}</span></h3>
+          <el-slider v-model="resume.spacing.padding" :step="2" :min="20" :max="50"></el-slider>
         </div>
         <div class="page-dialog-item">
-          <h3 class="title">模块上下间距：<span style="color: #f60">{{ spacing.moduleSpace }}</span></h3>
-          <el-slider v-model="spacing.moduleSpace" :step="1" :min="10" :max="30"></el-slider>
+          <h3 class="title">模块上下间距：<span style="color: #f60">{{ resume.spacing.moduleSpace }}</span></h3>
+          <el-slider v-model="resume.spacing.moduleSpace" :step="1" :min="10" :max="30"></el-slider>
         </div>
         <div class="page-dialog-item">
-          <h3 class="title">行间距：<span style="color: #f60">{{ spacing.lineHeight }}</span></h3>
-          <el-slider v-model="spacing.lineHeight" :step="0.05" :min="0.3" :max="1.3"></el-slider>
+          <h3 class="title">行间距：<span style="color: #f60">{{ resume.spacing.lineHeight }}</span></h3>
+          <el-slider v-model="resume.spacing.lineHeight" :step="0.05" :min="0.3" :max="1.3"></el-slider>
         </div>
         <el-button @click="resetSpacing">重置</el-button>
       </div>
@@ -87,7 +87,7 @@
           <div class="theme-colors">
             <div class="color-item"
                  v-for="(c,idx) in skinColors" :key="idx"
-                 :style="{backgroundColor: c,border: idx === colorIndex ? '3px solid red' : ''}"
+                 :style="{backgroundColor: c,border: idx === resume.theme.colorIndex ? '3px solid red' : ''}"
                  @click="updateSkinColor(idx)">
             </div>
           </div>
@@ -95,14 +95,14 @@
         <FAQ></FAQ>
       </div>
 
-      <div id="resume" class="resume" :style="{fontFamily: fontFamily}">
+      <div id="resume" class="resume" :style="{fontFamily: resume.font.family}">
         <div class="resume-head-container">
           <div class="right-box">
             <i class="myfont myicon-xueshimao"></i>
             <i class="myfont myicon-shoutibao"></i>
           </div>
-          <dl id="resume-head" class="left-box" :style="{color: theme.color}">
-            <dt class="left" :style="{borderColor: theme.color}">{{ resume.title }}</dt>
+          <dl id="resume-head" class="left-box" :style="{color: resume.theme.color}">
+            <dt class="left" :style="{borderColor: resume.theme.color}">{{ resume.title }}</dt>
             <dd class="right">
               <p>{{ resume.slogan }}</p>
               Personal resume
@@ -110,14 +110,14 @@
           </dl>
         </div>
 
-        <ResumeSeparator :themeColor="theme.color"></ResumeSeparator>
+        <ResumeSeparator :themeColor="resume.theme.color"></ResumeSeparator>
 
         <draggable
           class="resume-body"
           :style="{
-            fontSize: fontValue + 'px',
-            paddingLeft: `${spacing.padding}px`,
-            paddingRight: `${spacing.padding + 10}px`
+            fontSize: resume.font.size + 'px',
+            paddingLeft: `${resume.spacing.padding}px`,
+            paddingRight: `${resume.spacing.padding + 10}px`
           }"
           tag="div"
           v-bind="{
@@ -127,7 +127,7 @@
             ghostClass: 'ghost'
           }">
           <div class="module basic-info" v-show="resume.showBasicInfo">
-            <ModuleHead title="基本信息" :color="theme.color"
+            <ModuleHead title="基本信息" :color="resume.theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
             <ul class="module-content" :style="moduleContentStyle">
@@ -162,11 +162,11 @@
             </ul>
           </div>
           <div class="module education-bg" v-show="resume.showTeach">
-            <ModuleHead title="教育背景" :color="theme.color"
+            <ModuleHead title="教育背景" :color="resume.theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
             <ul class="module-content" :style="[
-              {lineHeight: 1 + spacing.lineHeight},
+              {lineHeight: 1 + resume.spacing.lineHeight},
               moduleContentStyle
             ]">
               <li v-for="(edu,idx) in resume.educations" :key="idx">
@@ -181,7 +181,7 @@
                 </div>
                 <DescriptionShow
                   :description="edu.description"
-                  :lineHeight="spacing.lineHeight"
+                  :lineHeight="resume.spacing.lineHeight"
                   marginTop="1rem"
                   marginBottom="1rem">
                 </DescriptionShow>
@@ -189,11 +189,11 @@
             </ul>
           </div>
           <div class="module" v-show="resume.showProject">
-            <ModuleHead title="项目经历" :color="theme.color"
+            <ModuleHead title="项目经历" :color="resume.theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
             <ul class="module-content" :style="[
-              {lineHeight: 1 + spacing.lineHeight},
+              {lineHeight: 1 + resume.spacing.lineHeight},
               moduleContentStyle
             ]">
               <li v-for="(project,idx) in resume.projects" :key="idx">
@@ -206,7 +206,7 @@
                 </div>
                 <DescriptionShow
                   :description="project.content"
-                  :lineHeight="spacing.lineHeight"
+                  :lineHeight="resume.spacing.lineHeight"
                   marginTop="1rem"
                   marginBottom="1rem">
                 </DescriptionShow>
@@ -214,30 +214,30 @@
             </ul>
           </div>
           <div class="module" v-show="resume.showSkill">
-            <ModuleHead title="专业技能" :color="theme.color"
+            <ModuleHead title="专业技能" :color="resume.theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
             <ul class="module-content" :style="[
-              {lineHeight: 1 + spacing.lineHeight},
+              {lineHeight: 1 + resume.spacing.lineHeight},
               moduleContentStyle
             ]">
               <DescriptionShow
                 :description="resume.skillDescription"
-                :lineHeight="spacing.lineHeight">
+                :lineHeight="resume.spacing.lineHeight">
               </DescriptionShow>
             </ul>
           </div>
           <div class="module" v-show="resume.showHonor">
-            <ModuleHead title="荣誉证书" :color="theme.color"
+            <ModuleHead title="荣誉证书" :color="resume.theme.color"
                         :darkerColor="darkerColor">
             </ModuleHead>
             <ul class="module-content" :style="[
-              {lineHeight: 1 + spacing.lineHeight},
+              {lineHeight: 1 + resume.spacing.lineHeight},
               moduleContentStyle
             ]">
               <DescriptionShow
                 :description="resume.honorDescription"
-                :lineHeight="spacing.lineHeight">
+                :lineHeight="resume.spacing.lineHeight">
               </DescriptionShow>
             </ul>
           </div>
@@ -457,25 +457,14 @@ export default {
   components: {ResumeSeparator, DescriptionShow, EditTopItem, ModuleHead, Navbar, FAQ, Draggable, Editor},
   data () {
     return {
-      colorIndex: 0,
       skinColors: [
         '#4e7282', '#284967', '#333333', '#3978a3', '#1575bf', '#0e88ad',
         '#a08f75', '#c19f67', '#ed7d31', '#67a886', '#76ba31', '#f36c6c'
       ],
-      theme: {
-        color: '#4e7282'
-      },
-      spacing: {
-        padding: 32,
-        moduleSpace: 20,
-        lineHeight: 0.35
-      },
-      fontValue: '14',
-      fontValues: [
+      fontSizes: [
         {value: '12', label: '12'}, {value: '13', label: '13'}, {value: '14', label: '14'},
         {value: '15', label: '15'}, {value: '16', label: '16'}
       ],
-      fontFamily: 'Microsoft YaHei,SimSun,PingFang SC,PingFang SC Regular',
       fontFamilies: [
         {value: 'Microsoft YaHei,SimSun,PingFang SC,PingFang SC Regular', label: '微软雅黑'},
         {value: 'SimSun,Microsoft YaHei', label: '宋体'},
@@ -491,6 +480,19 @@ export default {
       toAge: false,
       tabIndexes: [0, 1, 2, 3, 4],
       resume: {
+        theme: {
+          colorIndex: 0,
+          color: '#4e7282'
+        },
+        spacing: {
+          padding: 32,
+          moduleSpace: 20,
+          lineHeight: 0.35
+        },
+        font: {
+          size: '14',
+          family: 'Microsoft YaHei,SimSun,PingFang SC,PingFang SC Regular'
+        },
         title: '个人简历',
         slogan: '努力超越自己，每天进步一点点',
         // 基本信息
@@ -547,16 +549,16 @@ export default {
   computed: {
     moduleContentStyle () {
       return {
-        borderTop: `1px solid ${this.theme.color}`,
-        borderLeft: `1px solid ${this.theme.color}`,
-        paddingTop: `${this.spacing.moduleSpace}px`,
-        paddingBottom: `${this.spacing.moduleSpace}px`
+        borderTop: `1px solid ${this.resume.theme.color}`,
+        borderLeft: `1px solid ${this.resume.theme.color}`,
+        paddingTop: `${this.resume.spacing.moduleSpace}px`,
+        paddingBottom: `${this.resume.spacing.moduleSpace}px`
       }
     },
     darkerColor () {
-      let r = parseInt(this.theme.color.substring(1, 3), 16)
-      let g = parseInt(this.theme.color.substring(3, 5), 16)
-      let b = parseInt(this.theme.color.substring(5), 16)
+      let r = parseInt(this.resume.theme.color.substring(1, 3), 16)
+      let g = parseInt(this.resume.theme.color.substring(3, 5), 16)
+      let b = parseInt(this.resume.theme.color.substring(5), 16)
       return `rgb(${r - 40},${g - 40},${b - 40})`
     },
     monthDiff () {
@@ -595,11 +597,11 @@ export default {
       this.resume.projects.push(new Project())
     },
     resetSpacing () {
-      this.spacing = {padding: 32, moduleSpace: 20, lineHeight: 0.35}
+      this.resume.spacing = {padding: 32, moduleSpace: 20, lineHeight: 0.35}
     },
     updateSkinColor (idx) {
-      this.colorIndex = idx
-      this.theme.color = this.skinColors[idx]
+      this.resume.theme.colorIndex = idx
+      this.resume.theme.color = this.skinColors[idx]
     },
     updateResumeName () {
       if (this.resume.name.length === 0) {
